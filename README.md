@@ -93,6 +93,27 @@ Si el capítulo adquiere un dominio personalizado (ej. `ras-uady.org`) en lugar 
 3.  **Robots:** Modificar la ruta del sitemap en `src/app/robots.ts`.
 4.  **CORS (Cross-Origin Resource Sharing):** Ingresar a Supabase > Authentication > URL Configuration, y añadir el nuevo dominio a la lista de "Site URL" y "Redirect URLs" para que el inicio de sesión funcione correctamente.
 
+### D. Sistema de Mensajería (Formulario de Contacto)
+
+La plataforma utiliza **Resend** como motor transaccional para el envío de correos electrónicos. Esta decisión arquitectónica responde a una restricción de la infraestructura: Cloudflare Workers (entorno Serverless Edge) no soporta las conexiones TCP crudas que requieren las librerías SMTP tradicionales (como `nodemailer`). Resend resuelve este impedimento operando enteramente a través de peticiones HTTP (API REST).
+
+**Mantenimiento y Lógica de Operación:**
+Toda la lógica de procesamiento del formulario, validación de campos, formateo de asuntos y comunicación con la API externa se encuentra centralizada en el archivo `src/app/api/contact/route.ts`.
+
+El comportamiento del sistema es dinámico y está controlado por variables de entorno alojadas en el panel de Cloudflare (sección _Workers & Pages > Settings > Variables_):
+
+- `RESEND_API_KEY`: Credencial de autenticación que enlaza la plataforma con el servicio de correo.
+- `CONTACT_EMAIL`: La dirección de la Mesa Directiva que recibe los mensajes (actualmente configurada para buzones de Gmail).
+- `SENDER_EMAIL`: La dirección que envía el correo. En infraestructuras sin dominio verificado, utiliza el _sandbox_ predeterminado (`onboarding@resend.dev`). La lógica del código inyecta el correo del usuario en la cabecera `reply_to`, permitiendo a la directiva responder directamente desde su bandeja de entrada.
+
+**Adaptabilidad y Migración de Dominio (Future-Proofing):**
+El código fuente fue diseñado para ser completamente agnóstico al dominio. Si en el futuro el capítulo adquiere correos institucionales personalizados (por ejemplo, `contacto@ras.uady.mx`), **no es necesario tocar, modificar ni redesplegar el código fuente**.
+
+El procedimiento de adaptación es estrictamente operativo:
+
+1. El nuevo Webmaster debe verificar el dominio en el panel de administración de Resend configurando los registros DNS (TXT/MX) en el proveedor del dominio.
+2. Actualizar los valores de las variables `CONTACT_EMAIL` y `SENDER_EMAIL` en el panel de Cloudflare. El sistema adoptará las nuevas rutas de mensajería instantáneamente en la siguiente petición.
+
 ---
 
 ## 5. Directrices de Contribución

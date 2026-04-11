@@ -222,8 +222,6 @@ export default function AdminDashboard() {
   };
 
   const toggleDestacada = async (id: string, estadoActual: boolean) => {
-    // Opcional: Si solo quieres una destacada a la vez, podrías hacer un update global a false primero.
-    // Aquí simplemente activamos/desactivamos la bandera.
     const { error } = await supabase
       .from("actividades")
       .update({ destacada: !estadoActual })
@@ -410,7 +408,7 @@ export default function AdminDashboard() {
           enlace: patFormData.enlace,
           activo: patFormData.activo,
         };
-        if (imageUrl) updates.logo_url = imageUrl; // Note: Column is logo_url
+        if (imageUrl) updates.logo_url = imageUrl;
         const { error } = await supabase
           .from("patrocinadores")
           .update(updates)
@@ -433,37 +431,38 @@ export default function AdminDashboard() {
       <Toaster position="bottom-right" />
 
       {/* HEADER DE ADMINISTRADOR */}
-      <section className="bg-white pt-32 pb-8 md:pt-40 md:pb-6 border-b border-neutral-100">
+      <section className="bg-white pt-24 pb-6 md:pt-40 md:pb-6 border-b border-neutral-100">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-8">
-            <div className="flex items-center gap-5">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-6 md:mb-8">
+            <div className="flex items-center gap-4 md:gap-5">
               <div className="flex-shrink-0 bg-slate-50 p-2 rounded-xl border border-neutral-200 shadow-sm">
                 <Image
                   src="/IMG/favicon.svg"
                   alt="Favicon RAS"
-                  width={48}
-                  height={48}
+                  width={40}
+                  height={40}
+                  className="md:w-12 md:h-12"
                 />
               </div>
               <div>
-                <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-t from-[#5f2167] to-[#98002e] bg-clip-text text-transparent">
+                <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-t from-[#5f2167] to-[#98002e] bg-clip-text text-transparent">
                   Panel de Control
                 </h1>
-                <p className="text-neutral-500 text-sm mt-1 font-medium">
+                <p className="text-neutral-500 text-xs md:text-sm mt-1 font-medium">
                   Sistema de Gestión de Contenidos
                 </p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="text-sm font-bold text-red-600 hover:text-red-700 transition-colors flex items-center gap-2 cursor-pointer"
+              className="text-sm font-bold text-red-600 hover:text-red-700 transition-colors flex items-center gap-2 cursor-pointer w-fit"
             >
               Cerrar Sesión
             </button>
           </div>
 
-          {/* Navegación de Módulos */}
-          <div className="flex flex-wrap gap-2">
+          {/* Navegación de Módulos (Scrollable en Móvil) */}
+          <div className="flex overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] gap-2 border-b border-neutral-200 w-full">
             {[
               { id: "actividades", label: "Actividades" },
               { id: "directivos", label: "Directivos (Nosotros)" },
@@ -473,7 +472,11 @@ export default function AdminDashboard() {
               <button
                 key={tab.id}
                 onClick={() => setMainTab(tab.id as any)}
-                className={`px-5 py-2.5 text-sm font-bold rounded-t-lg transition-colors cursor-pointer ${mainTab === tab.id ? "bg-slate-50 border-t border-l border-r border-neutral-200 text-[#98002e]" : "text-neutral-500 hover:text-neutral-700 hover:bg-neutral-50"}`}
+                className={`whitespace-nowrap px-4 py-3 md:px-5 md:py-2.5 text-sm font-bold transition-colors cursor-pointer border-b-2 ${
+                  mainTab === tab.id
+                    ? "border-[#98002e] text-[#98002e]"
+                    : "border-transparent text-neutral-500 hover:text-neutral-700 hover:bg-neutral-50"
+                }`}
               >
                 {tab.label}
               </button>
@@ -483,36 +486,51 @@ export default function AdminDashboard() {
       </section>
 
       {/* CONTENIDO PRINCIPAL */}
-      <main className="flex-1 py-8 container mx-auto max-w-7xl px-4 md:px-8">
+      <main className="flex-1 py-6 md:py-8 container mx-auto max-w-7xl px-4 md:px-8">
         {/* --- MÓDULO: ACTIVIDADES --- */}
         {mainTab === "actividades" && (
           <div className="animate-in fade-in duration-300">
-            <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
-              <div className="flex gap-4">
+            <div className="flex flex-col lg:flex-row justify-between gap-4 mb-6">
+              {/* Sub-tabs móviles responsivas */}
+              <div className="flex overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] w-full lg:w-auto bg-white rounded-lg border border-neutral-200 p-1">
                 <button
                   onClick={() => setActTabInfo("activas")}
-                  className={`px-4 py-2 text-sm font-bold rounded-t-lg border-b-2 transition-all cursor-pointer ${actTabInfo === "activas" ? "border-[#98002e] text-[#98002e]" : "border-transparent text-neutral-500 hover:text-neutral-700"}`}
+                  className={`flex-1 min-w-max px-4 py-2 text-sm font-bold rounded-md transition-all cursor-pointer ${
+                    actTabInfo === "activas"
+                      ? "bg-slate-100 text-[#98002e] shadow-sm"
+                      : "text-neutral-500 hover:text-neutral-700"
+                  }`}
                 >
                   Eventos Activos
                 </button>
                 <button
                   onClick={() => setActTabInfo("papelera")}
-                  className={`px-4 py-2 text-sm font-bold rounded-t-lg border-b-2 transition-all cursor-pointer ${actTabInfo === "papelera" ? "border-[#98002e] text-[#98002e]" : "border-transparent text-neutral-500 hover:text-neutral-700"}`}
+                  className={`flex-1 min-w-max px-4 py-2 text-sm font-bold rounded-md transition-all cursor-pointer ${
+                    actTabInfo === "papelera"
+                      ? "bg-slate-100 text-[#98002e] shadow-sm"
+                      : "text-neutral-500 hover:text-neutral-700"
+                  }`}
                 >
                   Papelera
                 </button>
               </div>
-              <div className="flex gap-3">
+
+              {/* Botones de acción 100% ancho en móvil */}
+              <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
                 <button
                   onClick={() => openModal("crear_act")}
-                  className="h-10 px-4 text-sm font-medium border rounded-md hover:shadow-md transition-all cursor-pointer bg-white"
+                  className="flex-1 sm:flex-none h-10 px-4 text-sm font-medium border rounded-md hover:shadow-md transition-all cursor-pointer bg-white"
                 >
                   + Añadir Manual
                 </button>
                 <button
                   onClick={handleSyncVTools}
                   disabled={isSyncing}
-                  className={`h-10 px-4 text-sm font-medium text-white shadow-md rounded-md transition-all cursor-pointer ${isSyncing ? "bg-neutral-400" : "bg-gradient-to-r from-[#5f2167] to-[#98002e] hover:opacity-90"}`}
+                  className={`flex-1 sm:flex-none h-10 px-4 text-sm font-medium text-white shadow-md rounded-md transition-all cursor-pointer ${
+                    isSyncing
+                      ? "bg-neutral-400"
+                      : "bg-gradient-to-r from-[#5f2167] to-[#98002e] hover:opacity-90"
+                  }`}
                 >
                   {isSyncing ? "Sincronizando..." : "Sincronizar vTools"}
                 </button>
@@ -521,14 +539,23 @@ export default function AdminDashboard() {
 
             <Card className="card-brand ring-0 border border-neutral-200 bg-white min-h-[400px]">
               <CardContent className="p-0">
-                <div className="overflow-x-auto">
+                {/* Scroll horizontal forzado en móvil */}
+                <div className="overflow-x-auto w-full">
                   <table className="w-full text-sm text-left text-neutral-600">
                     <thead className="text-xs text-neutral-500 uppercase bg-slate-50 border-b border-neutral-200">
                       <tr>
-                        <th className="px-6 py-4">Actividad</th>
-                        <th className="px-6 py-4">Fecha</th>
-                        <th className="px-6 py-4">Estado</th>
-                        <th className="px-6 py-4 text-right">Acciones</th>
+                        <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                          Actividad
+                        </th>
+                        <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                          Fecha
+                        </th>
+                        <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                          Estado
+                        </th>
+                        <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap text-right">
+                          Acciones
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-neutral-100">
@@ -559,8 +586,10 @@ export default function AdminDashboard() {
                           )
                           .map((act) => (
                             <tr key={act.id} className="hover:bg-slate-50">
-                              <td className="px-6 py-4 font-medium text-neutral-900">
-                                {act.titulo}
+                              <td className="px-4 md:px-6 py-3 md:py-4 font-medium text-neutral-900 whitespace-nowrap">
+                                {act.titulo.length > 35
+                                  ? act.titulo.substring(0, 35) + "..."
+                                  : act.titulo}
                                 {act.destacada && (
                                   <span className="ml-2 text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold">
                                     ★ Destacada
@@ -572,22 +601,26 @@ export default function AdminDashboard() {
                                   </span>
                                 )}
                               </td>
-                              <td className="px-6 py-4">
+                              <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
                                 {new Date(act.fecha_inicio).toLocaleDateString(
                                   "es-MX",
                                 )}
                               </td>
-                              <td className="px-6 py-4 uppercase text-[11px] font-bold">
+                              <td className="px-4 md:px-6 py-3 md:py-4 uppercase text-[11px] font-bold whitespace-nowrap">
                                 {act.origen}
                               </td>
-                              <td className="px-6 py-4 text-right space-x-3">
+                              <td className="px-4 md:px-6 py-3 md:py-4 text-right space-x-3 whitespace-nowrap">
                                 {actTabInfo === "activas" ? (
                                   <>
                                     <button
                                       onClick={() =>
                                         toggleDestacada(act.id, act.destacada)
                                       }
-                                      className={`text-[11px] font-bold px-2 py-1 rounded cursor-pointer transition-colors ${act.destacada ? "bg-amber-100 text-amber-700" : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200"}`}
+                                      className={`text-[11px] font-bold px-2 py-1 rounded cursor-pointer transition-colors ${
+                                        act.destacada
+                                          ? "bg-amber-100 text-amber-700"
+                                          : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200"
+                                      }`}
                                     >
                                       {act.destacada
                                         ? "Quitar Destacada"
@@ -642,28 +675,38 @@ export default function AdminDashboard() {
         {/* --- MÓDULO: MESA DIRECTIVA --- */}
         {mainTab === "directivos" && (
           <div className="animate-in fade-in duration-300">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
               <h2 className="text-xl font-bold text-neutral-800">
                 Miembros Registrados
               </h2>
               <button
                 onClick={() => openModal("crear_dir")}
-                className="h-10 px-4 bg-gradient-to-r from-[#5f2167] to-[#98002e] text-white text-sm font-medium rounded-md shadow-md hover:opacity-90 cursor-pointer"
+                className="w-full sm:w-auto h-10 px-4 bg-gradient-to-r from-[#5f2167] to-[#98002e] text-white text-sm font-medium rounded-md shadow-md hover:opacity-90 cursor-pointer"
               >
                 + Añadir Miembro
               </button>
             </div>
             <Card className="card-brand ring-0 border border-neutral-200 bg-white min-h-[400px]">
               <CardContent className="p-0">
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto w-full">
                   <table className="w-full text-sm text-left text-neutral-600">
                     <thead className="text-xs text-neutral-500 uppercase bg-slate-50 border-b border-neutral-200">
                       <tr>
-                        <th className="px-6 py-4">Orden</th>
-                        <th className="px-6 py-4">Nombre y Puesto</th>
-                        <th className="px-6 py-4">Periodo</th>
-                        <th className="px-6 py-4">Estado</th>
-                        <th className="px-6 py-4 text-right">Acciones</th>
+                        <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                          Orden
+                        </th>
+                        <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap min-w-[250px]">
+                          Nombre y Puesto
+                        </th>
+                        <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                          Periodo
+                        </th>
+                        <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                          Estado
+                        </th>
+                        <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap text-right">
+                          Acciones
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-neutral-100">
@@ -682,10 +725,10 @@ export default function AdminDashboard() {
                       ) : (
                         directivos.map((dir) => (
                           <tr key={dir.id} className="hover:bg-slate-50">
-                            <td className="px-6 py-4 font-bold text-neutral-400">
+                            <td className="px-4 md:px-6 py-3 md:py-4 font-bold text-neutral-400 whitespace-nowrap">
                               {dir.orden}
                             </td>
-                            <td className="px-6 py-4">
+                            <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
                               <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-full bg-neutral-200 overflow-hidden flex-shrink-0">
                                   {dir.imagen_url ? (
@@ -710,17 +753,21 @@ export default function AdminDashboard() {
                                 </div>
                               </div>
                             </td>
-                            <td className="px-6 py-4 font-medium">
+                            <td className="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">
                               {dir.periodo}
                             </td>
-                            <td className="px-6 py-4">
+                            <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
                               <span
-                                className={`inline-flex px-2 py-1 rounded-md text-[10px] font-bold uppercase ${dir.activo ? "bg-emerald-50 text-emerald-700" : "bg-neutral-100 text-neutral-500"}`}
+                                className={`inline-flex px-2 py-1 rounded-md text-[10px] font-bold uppercase ${
+                                  dir.activo
+                                    ? "bg-emerald-50 text-emerald-700"
+                                    : "bg-neutral-100 text-neutral-500"
+                                }`}
                               >
                                 {dir.activo ? "Activo" : "Inactivo"}
                               </span>
                             </td>
-                            <td className="px-6 py-4 text-right space-x-3">
+                            <td className="px-4 md:px-6 py-3 md:py-4 text-right space-x-3 whitespace-nowrap">
                               <button
                                 onClick={() => openModal("editar_dir", dir)}
                                 className="text-neutral-400 hover:text-[#98002e] font-medium cursor-pointer"
@@ -753,37 +800,51 @@ export default function AdminDashboard() {
         {/* --- MÓDULO: PROYECTOS --- */}
         {mainTab === "proyectos" && (
           <div className="animate-in fade-in duration-300">
-            <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
-              <div className="flex gap-4">
+            <div className="flex flex-col lg:flex-row justify-between gap-4 mb-6">
+              <div className="flex overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] w-full lg:w-auto bg-white rounded-lg border border-neutral-200 p-1">
                 <button
                   onClick={() => setProyTabInfo("activos")}
-                  className={`px-4 py-2 text-sm font-bold rounded-t-lg border-b-2 transition-all cursor-pointer ${proyTabInfo === "activos" ? "border-[#98002e] text-[#98002e]" : "border-transparent text-neutral-500 hover:text-neutral-700"}`}
+                  className={`flex-1 min-w-max px-4 py-2 text-sm font-bold rounded-md transition-all cursor-pointer ${
+                    proyTabInfo === "activos"
+                      ? "bg-slate-100 text-[#98002e] shadow-sm"
+                      : "text-neutral-500 hover:text-neutral-700"
+                  }`}
                 >
                   Proyectos Activos
                 </button>
                 <button
                   onClick={() => setProyTabInfo("papelera")}
-                  className={`px-4 py-2 text-sm font-bold rounded-t-lg border-b-2 transition-all cursor-pointer ${proyTabInfo === "papelera" ? "border-[#98002e] text-[#98002e]" : "border-transparent text-neutral-500 hover:text-neutral-700"}`}
+                  className={`flex-1 min-w-max px-4 py-2 text-sm font-bold rounded-md transition-all cursor-pointer ${
+                    proyTabInfo === "papelera"
+                      ? "bg-slate-100 text-[#98002e] shadow-sm"
+                      : "text-neutral-500 hover:text-neutral-700"
+                  }`}
                 >
                   Papelera
                 </button>
               </div>
               <button
                 onClick={() => openModal("crear_proy")}
-                className="h-10 px-4 bg-gradient-to-r from-[#5f2167] to-[#98002e] text-white text-sm font-medium rounded-md shadow-md cursor-pointer"
+                className="w-full lg:w-auto h-10 px-4 bg-gradient-to-r from-[#5f2167] to-[#98002e] text-white text-sm font-medium rounded-md shadow-md cursor-pointer"
               >
                 + Añadir Proyecto
               </button>
             </div>
             <Card className="card-brand ring-0 border border-neutral-200 bg-white min-h-[400px]">
               <CardContent className="p-0">
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto w-full">
                   <table className="w-full text-sm text-left text-neutral-600">
                     <thead className="text-xs text-neutral-500 uppercase bg-slate-50 border-b border-neutral-200">
                       <tr>
-                        <th className="px-6 py-4">Título del Proyecto</th>
-                        <th className="px-6 py-4">Tecnologías</th>
-                        <th className="px-6 py-4 text-right">Acciones</th>
+                        <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap min-w-[200px]">
+                          Título del Proyecto
+                        </th>
+                        <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap min-w-[200px]">
+                          Tecnologías
+                        </th>
+                        <th className="px-4 md:px-6 py-3 md:py-4 text-right whitespace-nowrap">
+                          Acciones
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-neutral-100">
@@ -808,13 +869,13 @@ export default function AdminDashboard() {
                           )
                           .map((proy) => (
                             <tr key={proy.id} className="hover:bg-slate-50">
-                              <td className="px-6 py-4 font-medium text-neutral-900">
+                              <td className="px-4 md:px-6 py-3 md:py-4 font-medium text-neutral-900 whitespace-nowrap">
                                 {proy.titulo}
                               </td>
-                              <td className="px-6 py-4 text-xs text-neutral-500">
+                              <td className="px-4 md:px-6 py-3 md:py-4 text-xs text-neutral-500 whitespace-nowrap">
                                 {proy.tecnologias}
                               </td>
-                              <td className="px-6 py-4 text-right space-x-3">
+                              <td className="px-4 md:px-6 py-3 md:py-4 text-right space-x-3 whitespace-nowrap">
                                 {proyTabInfo === "activos" ? (
                                   <>
                                     <button
@@ -866,27 +927,35 @@ export default function AdminDashboard() {
         {/* --- MÓDULO: PATROCINADORES --- */}
         {mainTab === "patrocinadores" && (
           <div className="animate-in fade-in duration-300">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
               <h2 className="text-xl font-bold text-neutral-800">
                 Aliados y Patrocinadores
               </h2>
               <button
                 onClick={() => openModal("crear_pat")}
-                className="h-10 px-4 bg-gradient-to-r from-[#5f2167] to-[#98002e] text-white text-sm font-medium rounded-md shadow-md cursor-pointer"
+                className="w-full sm:w-auto h-10 px-4 bg-gradient-to-r from-[#5f2167] to-[#98002e] text-white text-sm font-medium rounded-md shadow-md cursor-pointer"
               >
                 + Añadir Patrocinador
               </button>
             </div>
             <Card className="card-brand ring-0 border border-neutral-200 bg-white min-h-[400px]">
               <CardContent className="p-0">
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto w-full">
                   <table className="w-full text-sm text-left text-neutral-600">
                     <thead className="text-xs text-neutral-500 uppercase bg-slate-50 border-b border-neutral-200">
                       <tr>
-                        <th className="px-6 py-4">Patrocinador</th>
-                        <th className="px-6 py-4">Nivel</th>
-                        <th className="px-6 py-4">Estado</th>
-                        <th className="px-6 py-4 text-right">Acciones</th>
+                        <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap min-w-[250px]">
+                          Patrocinador
+                        </th>
+                        <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                          Nivel
+                        </th>
+                        <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                          Estado
+                        </th>
+                        <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap text-right">
+                          Acciones
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-neutral-100">
@@ -905,7 +974,7 @@ export default function AdminDashboard() {
                       ) : (
                         patrocinadores.map((pat) => (
                           <tr key={pat.id} className="hover:bg-slate-50">
-                            <td className="px-6 py-4 font-bold text-neutral-900 flex items-center gap-3">
+                            <td className="px-4 md:px-6 py-3 md:py-4 font-bold text-neutral-900 flex items-center gap-3 whitespace-nowrap">
                               {pat.logo_url && (
                                 <img
                                   src={pat.logo_url}
@@ -915,17 +984,21 @@ export default function AdminDashboard() {
                               )}
                               {pat.nombre}
                             </td>
-                            <td className="px-6 py-4 font-medium">
+                            <td className="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">
                               {pat.nivel}
                             </td>
-                            <td className="px-6 py-4">
+                            <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
                               <span
-                                className={`inline-flex px-2 py-1 rounded-md text-[10px] font-bold uppercase ${pat.activo ? "bg-emerald-50 text-emerald-700" : "bg-neutral-100 text-neutral-500"}`}
+                                className={`inline-flex px-2 py-1 rounded-md text-[10px] font-bold uppercase ${
+                                  pat.activo
+                                    ? "bg-emerald-50 text-emerald-700"
+                                    : "bg-neutral-100 text-neutral-500"
+                                }`}
                               >
                                 {pat.activo ? "Activo" : "Inactivo"}
                               </span>
                             </td>
-                            <td className="px-6 py-4 text-right space-x-3">
+                            <td className="px-4 md:px-6 py-3 md:py-4 text-right space-x-3 whitespace-nowrap">
                               <button
                                 onClick={() => openModal("editar_pat", pat)}
                                 className="text-neutral-400 hover:text-[#98002e] font-medium cursor-pointer"
@@ -959,7 +1032,7 @@ export default function AdminDashboard() {
       {/* --- SUPER MODAL DE GESTIÓN --- */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl w-full max-w-md p-5 sm:p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
             {/* Soft Delete (Ocultar) - Reutilizado para Actividades y Proyectos */}
             {modalMode === "eliminar_act" && (
               <div className="text-center">
@@ -1027,7 +1100,8 @@ export default function AdminDashboard() {
             )}
 
             {/* Formulario Maestro */}
-            {modalMode.includes("crear_") || modalMode.includes("editar_") ? (
+            {(modalMode.includes("crear_") ||
+              modalMode.includes("editar_")) && (
               <form onSubmit={handleDynamicSubmit} className="space-y-4">
                 <h3 className="text-xl font-bold bg-gradient-to-t from-[#5f2167] to-[#98002e] bg-clip-text text-transparent">
                   {modalMode.includes("crear_")
@@ -1404,7 +1478,7 @@ export default function AdminDashboard() {
                   </button>
                 </div>
               </form>
-            ) : null}
+            )}
           </div>
         </div>
       )}

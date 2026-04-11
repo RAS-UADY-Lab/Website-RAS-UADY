@@ -64,7 +64,7 @@ export default function LoginPage() {
             <div className="flex justify-center mb-6">
               <div className="bg-slate-50 p-3 rounded-xl border border-neutral-200 shadow-sm">
                 <Image
-                  src="/Favicon.svg"
+                  src="/IMG/favicon.svg"
                   alt="Logo RAS"
                   width={56}
                   height={56}

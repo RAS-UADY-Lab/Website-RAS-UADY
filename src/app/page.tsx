@@ -729,7 +729,7 @@ export default function HomePage() {
           </div>
 
           <div className="flex w-full relative flex-nowrap overflow-hidden">
-            <div className="flex animate-scroll shrink-0 min-w-full justify-around items-center">
+            <div className="flex animate-marquee shrink-0 min-w-full justify-around items-center">
               {arrayPatrocinadores.map((pat, idx) => (
                 <div
                   key={`pat1-${pat.id}-${idx}`}
@@ -776,7 +776,7 @@ export default function HomePage() {
             </div>
 
             <div
-              className="flex animate-scroll shrink-0 min-w-full justify-around items-center"
+              className="flex animate-marquee shrink-0 min-w-full justify-around items-center"
               aria-hidden="true"
             >
               {arrayPatrocinadores.map((pat, idx) => (
@@ -886,7 +886,9 @@ export default function HomePage() {
               </CardContent>
               <div className="p-6 pt-0 mt-auto">
                 <Link
-                  href="#"
+                  href="https://docs.google.com/forms/d/e/1FAIpQLSeTNdu4XW6zMsYH5QNHUW7Iwf5jtVzBBgGNqLzheyNjqEr6CA/viewform?usp=header"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="group/btn relative inline-flex w-full h-10 items-center justify-center rounded-md overflow-hidden border border-neutral-300 shadow-sm transition-all duration-300 hover:border-transparent hover:shadow-md cursor-pointer"
                 >
                   <span className="absolute inset-0 bg-gradient-to-r from-[#5f2167] to-[#98002e] opacity-0 transition-opacity duration-300 group-hover/btn:opacity-100"></span>

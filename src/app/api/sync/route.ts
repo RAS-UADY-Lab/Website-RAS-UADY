@@ -3,6 +3,32 @@ import { createClient } from '@supabase/supabase-js';
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+// Función para limpiar etiquetas HTML y decodificar caracteres especiales
+function decodificarHTML(texto: string | null) {
+  if (!texto) return "";
+  
+  const entidades: { [key: string]: string } = {
+    '&aacute;': 'á', '&eacute;': 'é', '&iacute;': 'í', '&oacute;': 'ó', '&uacute;': 'ú',
+    '&Aacute;': 'Á', '&Eacute;': 'É', '&Iacute;': 'Í', '&Oacute;': 'Ó', '&Uacute;': 'Ú',
+    '&ntilde;': 'ñ', '&Ntilde;': 'Ñ', '&uuml;': 'ü', '&Uuml;': 'Ü',
+    '&iquest;': '¿', '&iexcl;': '¡', '&amp;': '&', '&quot;': '"', '&apos;': "'",
+    '&lt;': '<', '&gt;': '>', '&nbsp;': ' ', '&ndash;': '–', '&mdash;': '—'
+  };
+
+  // 1. Limpiamos todas las etiquetas HTML nativas (ej. <p>, <br>, <strong>)
+  let textoLimpio = texto.replace(/<[^>]*>?/gm, '');
+  
+  // 2. Reemplazamos las entidades por sus caracteres reales
+  let textoDecodificado = textoLimpio.replace(/&[a-zA-Z0-9#]+;/g, match => entidades[match] || match);
+
+  // 3. Truncamos el texto a 200 caracteres si es muy largo
+  if (textoDecodificado.length > 200) {
+    return textoDecodificado.substring(0, 200) + "...";
+  }
+  
+  return textoDecodificado;
+}
+
 // Función para extraer la imagen y obligarla a usar el dominio original de IEEE
 function extraerEnlaceImagen(texto: string | null) {
   if (!texto) return null;
@@ -75,7 +101,7 @@ export async function POST(request: Request) {
       return {
         vtools_id: String(attr.id),
         titulo: attr.title,
-        descripcion: attr.description?.replace(/<[^>]*>?/gm, '').substring(0, 200) + "..." || "",
+        descripcion: decodificarHTML(attr.description), // Aplicamos la nueva función decodificadora
         fecha_inicio: attr["start-time"],
         enlace: attr.link,
         imagen_url: extraerEnlaceImagen(attr.header),

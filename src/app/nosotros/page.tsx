@@ -87,7 +87,7 @@ export default function NosotrosPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-neutral-600 leading-relaxed">
+                <p className="pb-8 text-neutral-600 leading-relaxed">
                   Impulsar el desarrollo académico, técnico y humano de los
                   estudiantes de la Facultad de Ingeniería de la UADY, mediante
                   actividades formativas, colaborativas y de divulgación en el
@@ -105,7 +105,7 @@ export default function NosotrosPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-neutral-600 leading-relaxed">
+                <p className="pb-8 text-neutral-600 leading-relaxed">
                   Ser un capítulo estudiantil referente en México y
                   Latinoamérica por su compromiso con la excelencia, la
                   formación integral de sus miembros y la promoción de la

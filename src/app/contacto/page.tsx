@@ -81,7 +81,7 @@ export default function ContactoPage() {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight bg-gradient-to-t from-[#5f2167] to-[#98002e] bg-clip-text text-transparent mb-6">
             Contacto
           </h1>
-          <p className="text-lg md:text-xl text-neutral-600 leading-relaxed">
+          <p className="text-lg md:text-xl text-neutral-600 leading-relaxed text-pretty">
             ¿Tienes dudas, comentarios o quieres más información para unirte al
             capítulo? Escríbenos y con gusto te responderemos. Estamos aquí para
             ayudarte a dar tus primeros pasos en el mundo de la robótica y
@@ -108,7 +108,6 @@ export default function ContactoPage() {
               >
                 <Card className="group card-brand ring-0 transition-all duration-300 hover:-translate-y-1">
                   <CardContent className="flex items-center gap-5 p-5">
-                    {/* Ícono sin fondo, coloreado con degradado en hover */}
                     <div className="flex items-center justify-center w-10">
                       <i className="icon-Mail text-3xl text-neutral-400 transition-all duration-300 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-t group-hover:from-[#5f2167] group-hover:to-[#98002e]"></i>
                     </div>
@@ -172,8 +171,8 @@ export default function ContactoPage() {
                 </Card>
               </a>
 
-              {/* Redes Sociales */}
-              <div className="flex items-center gap-4 mt-4">
+              {/* Redes Sociales (Íconos Cuadrados Centrados) */}
+              <div className="flex items-center justify-center gap-6 mt-4">
                 <a
                   href="https://www.facebook.com/RAS.UADY"
                   target="_blank"
@@ -190,6 +189,14 @@ export default function ContactoPage() {
                 >
                   <i className="icon-Instagram1 text-2xl"></i>
                 </a>
+                <a
+                  href="https://linktr.ee/RAS.UADY"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center w-12 h-12 rounded-md border border-neutral-200 bg-white text-neutral-400 shadow-sm transition-all duration-300 hover:border-transparent hover:shadow-md hover:-translate-y-1 hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-t hover:from-[#5f2167] hover:to-[#98002e] cursor-pointer"
+                >
+                  <i className="icon-LinkExterno text-2xl"></i>
+                </a>
               </div>
             </div>
 
@@ -201,7 +208,6 @@ export default function ContactoPage() {
                     Envíanos un mensaje
                   </CardTitle>
                 </CardHeader>
-                {/* Se añadió pb-8 para dar respiro al final del formulario */}
                 <CardContent className="pb-8">
                   <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Campo: Asunto */}
@@ -334,7 +340,7 @@ export default function ContactoPage() {
                       </div>
                     )}
 
-                    {/* Botón de Envío con arquitectura multicapa (Separado del borde inferior) */}
+                    {/* Botón de Envío */}
                     <div className="pt-2">
                       <button
                         type="submit"

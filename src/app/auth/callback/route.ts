@@ -5,8 +5,6 @@ import { createServerClient } from '@supabase/ssr'
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  
-  // A dónde lo enviaremos después del login exitoso
   const next = searchParams.get('next') ?? '/admin'
 
   if (code) {
@@ -26,24 +24,21 @@ export async function GET(request: Request) {
                 cookieStore.set(name, value, options)
               )
             } catch (error) {
-              // Manejo de error silencioso para Server Components
+              // Manejo de error silencioso requerido por Server Components
             }
           },
         },
       }
     )
     
-    // Intercambiamos el código de Google por una Cookie de Sesión segura
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (error) {
-      console.error("❌ ERROR EN AUTH CALLBACK:", error.message);
+      console.error("ERROR EN AUTH CALLBACK:", error.message);
     } else {
-      // ¡Éxito! Lo dejamos pasar al panel
       return NextResponse.redirect(`${origin}${next}`)
     }
   }
 
-  // Si algo falló con Google, lo regresamos al login
   return NextResponse.redirect(`${origin}/login?error=auth-callback-failed`)
 }

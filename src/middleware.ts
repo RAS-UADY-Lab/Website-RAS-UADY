@@ -22,24 +22,29 @@ export async function middleware(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
-  const allowedEmails = (process.env.ADMIN_EMAILS || "").split(',');
+  
+  // Procesamiento robusto de correos: elimina espacios accidentales y unifica a minúsculas
+  const rawAdminEmails = process.env.ADMIN_EMAILS || "";
+  const allowedEmails = rawAdminEmails
+    .split(',')
+    .map((email) => email.trim().toLowerCase());
+
+  const currentUserEmail = (user?.email || "").toLowerCase();
 
   // 1. Proteger la ruta /admin
   if (request.nextUrl.pathname.startsWith('/admin')) {
     if (!user) {
-      // Si no ha iniciado sesión, al login
       return NextResponse.redirect(new URL('/login', request.url))
     }
     
-    if (!allowedEmails.includes(user.email || '')) {
-      // Si inició sesión pero no es Admin, lo regresamos con un mensaje de error
+    if (!allowedEmails.includes(currentUserEmail)) {
       return NextResponse.redirect(new URL('/login?error=unauthorized', request.url))
     }
   }
 
   // 2. Si ya es Admin y está en /login, enviarlo directo al panel
   if (request.nextUrl.pathname.startsWith('/login') && user) {
-     if (allowedEmails.includes(user.email || '')) {
+     if (allowedEmails.includes(currentUserEmail)) {
          return NextResponse.redirect(new URL('/admin', request.url))
      }
   }
@@ -47,7 +52,6 @@ export async function middleware(request: NextRequest) {
   return supabaseResponse
 }
 
-// Rutas donde el middleware debe ejecutarse
 export const config = {
   matcher: ['/admin/:path*', '/login'],
 }

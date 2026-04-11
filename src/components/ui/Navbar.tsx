@@ -127,30 +127,35 @@ export default function Navbar() {
         <nav className="flex flex-col items-center gap-8 text-center w-full px-6">
           <Link
             href="/"
+            onClick={() => setIsOpen(false)}
             className="text-2xl font-bold text-fluid-gradient cursor-pointer"
           >
             Inicio
           </Link>
           <Link
             href="/nosotros"
+            onClick={() => setIsOpen(false)}
             className="text-2xl font-bold text-fluid-gradient cursor-pointer"
           >
             Nosotros
           </Link>
           <Link
             href="/actividades"
+            onClick={() => setIsOpen(false)}
             className="text-2xl font-bold text-fluid-gradient cursor-pointer"
           >
             Actividades
           </Link>
           <Link
             href="/proyectos"
+            onClick={() => setIsOpen(false)}
             className="text-2xl font-bold text-fluid-gradient cursor-pointer"
           >
             Proyectos
           </Link>
           <Link
             href="/membresia"
+            onClick={() => setIsOpen(false)}
             className="text-2xl font-bold text-fluid-gradient cursor-pointer"
           >
             Membresía
@@ -162,6 +167,7 @@ export default function Navbar() {
             href="https://mynodum.vercel.app"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => setIsOpen(false)}
             className="w-full max-w-xs inline-flex h-12 items-center justify-center rounded-md border border-neutral-200 bg-slate-50 px-4 py-2 text-base font-bold shadow-sm cursor-pointer group"
           >
             <i className="icon-Laptop mr-2 text-neutral-500"></i>
@@ -170,6 +176,7 @@ export default function Navbar() {
 
           <Link
             href="/contacto"
+            onClick={() => setIsOpen(false)}
             className="w-full max-w-xs inline-flex h-12 items-center justify-center rounded-md bg-gradient-to-r from-[#5f2167] to-[#98002e] px-5 py-2 text-base font-medium text-white shadow-md cursor-pointer"
           >
             <i className="icon-trato mr-2 text-xl"></i> Unirme al Capítulo
