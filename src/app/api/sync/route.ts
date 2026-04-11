@@ -3,13 +3,6 @@ import { createClient } from '@supabase/supabase-js';
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-// 1. Inicializamos un cliente de Supabase con permisos de Dios (Service Role)
-// Esto es estrictamente necesario para saltarse las reglas de RLS en tareas de fondo
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! 
-);
-
 // Función para extraer la imagen y obligarla a usar el dominio original de IEEE
 function extraerEnlaceImagen(texto: string | null) {
   if (!texto) return null;
@@ -24,6 +17,13 @@ function extraerEnlaceImagen(texto: string | null) {
 
 export async function POST(request: Request) {
   try {
+    // 1. INICIALIZACIÓN DEL CLIENTE (Debe estar AQUÍ adentro para que Cloudflare no explote al compilar)
+    // Esto es estrictamente necesario para saltarse las reglas de RLS en tareas de fondo
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY! 
+    );
+
     // --- CAPA DE SEGURIDAD ---
     const authHeader = request.headers.get("authorization");
     const isCronJob = authHeader === `Bearer ${process.env.CRON_SECRET}`;
