@@ -12,6 +12,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://ras-uady.ras-fiuady.workers.dev"),
   title: "IEEE RAS UADY | Capítulo Estudiantil",
   description:
     "Sitio oficial de la Sociedad de Robótica y Automatización en la Facultad de Ingeniería de la UADY.",

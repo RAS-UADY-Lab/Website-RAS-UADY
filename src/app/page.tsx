@@ -46,12 +46,60 @@ export default function HomePage() {
   const [patrocinadores, setPatrocinadores] = useState<Patrocinador[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Estado del motor de animación para la esfera del Hero
+  const [heroOrb, setHeroOrb] = useState({
+    x: 85, // Posición inicial X (%)
+    y: 25, // Posición inicial Y (%)
+    scale: 1, // Tamaño
+    opacity: 0, // Inicia invisible para el primer Fade In
+    isTransitioning: true, // Controla si CSS debe animar o aplicar instantáneamente
+  });
+
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   );
 
   useEffect(() => {
+    // 1. Motor de Animación de la Esfera
+    // Entrada inicial
+    const initialTimer = setTimeout(() => {
+      setHeroOrb((prev) => ({ ...prev, opacity: 0.35 }));
+    }, 500);
+
+    const orbInterval = setInterval(() => {
+      // Fase A: Iniciar desvanecimiento (Fade Out)
+      setHeroOrb((prev) => ({ ...prev, opacity: 0 }));
+
+      // Fase B: Esperar a que termine el desvanecimiento para reubicar (2.5s)
+      setTimeout(() => {
+        const newX = Math.floor(Math.random() * 80) + 10; // Rango: 10% a 90%
+        const newY = Math.floor(Math.random() * 80) + 10; // Rango: 10% a 90%
+        const newScale = Math.random() * 0.8 + 0.6; // Rango: 0.6 a 1.4
+
+        // Reubicación instantánea invisible
+        setHeroOrb({
+          x: newX,
+          y: newY,
+          scale: newScale,
+          opacity: 0,
+          isTransitioning: false,
+        });
+
+        // Fase C: Reactivar transición y hacer Fade In
+        setTimeout(() => {
+          setHeroOrb({
+            x: newX,
+            y: newY,
+            scale: newScale,
+            opacity: 0.35,
+            isTransitioning: true,
+          });
+        }, 100);
+      }, 2500);
+    }, 9000); // Ciclo completo cada 9 segundos
+
+    // 2. Extracción de Datos
     const fetchHomeData = async () => {
       setIsLoading(true);
       const currentYear = new Date().getFullYear();
@@ -59,7 +107,6 @@ export default function HomePage() {
       // Cálculo dinámico de años desde la fundación oficial (2024)
       const aniosCalculados = Math.max(1, currentYear - 2024);
 
-      // 1. Obtener Estadísticas (Proyectos y Eventos)
       const [resProyectos, resEventos] = await Promise.all([
         supabase
           .from("proyectos")
@@ -78,7 +125,6 @@ export default function HomePage() {
         aniosActivos: aniosCalculados,
       });
 
-      // 2. Obtener Actividad Destacada
       const resDestacada = await supabase
         .from("actividades")
         .select("id, titulo, descripcion, enlace, imagen_url, fecha_inicio")
@@ -89,7 +135,6 @@ export default function HomePage() {
 
       if (resDestacada.data) setDestacada(resDestacada.data);
 
-      // 3. Obtener Patrocinadores Activos
       const resPats = await supabase
         .from("patrocinadores")
         .select("*")
@@ -102,6 +147,12 @@ export default function HomePage() {
     };
 
     fetchHomeData();
+
+    // Limpieza de intervalos al desmontar
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(orbInterval);
+    };
   }, [supabase]);
 
   // UMBRAL DE ESTADÍSTICAS
@@ -117,69 +168,63 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col w-full overflow-x-hidden">
-      {/* ANIMACIONES NATIVAS EN LÍNEA (A prueba de balas) */}
-      <style jsx>{`
-        @keyframes spin-slow {
-          0% {
-            transform: rotate(0deg);
-          }
-          100% {
-            transform: rotate(360deg);
-          }
-        }
-        .animate-spin-slow {
-          animation: spin-slow 120s linear infinite;
-        }
-        @keyframes scroll-infinite {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-100%);
-          }
-        }
-        .animate-scroll {
-          animation: scroll-infinite 40s linear infinite;
-        }
-      `}</style>
-
       {/* HERO SECTION */}
       <section className="relative w-full bg-gradient-to-br from-[#98002e] to-[#5f2167] pt-36 pb-24 md:pt-44 md:pb-32 overflow-hidden shadow-sm shadow-neutral-900/20">
+        {/* Capa 1: Oscurecimiento base */}
         <div className="absolute inset-0 bg-black/10 mix-blend-overlay z-0"></div>
 
-        {/* ESFERA DE NODOS (3D UI) */}
-        <div className="absolute -right-32 -top-32 md:-right-64 md:-top-40 w-[500px] h-[500px] md:w-[900px] md:h-[900px] opacity-20 pointer-events-none animate-spin-slow z-0">
-          <svg
-            viewBox="0 0 200 200"
-            className="w-full h-full"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <g stroke="#ffffff" strokeWidth="0.5" fill="none" opacity="0.8">
-              <circle
-                cx="100"
-                cy="100"
-                r="90"
-                strokeDasharray="2 4"
-                strokeWidth="0.8"
-              />
-              <ellipse cx="100" cy="100" rx="90" ry="30" />
-              <ellipse cx="100" cy="100" rx="90" ry="60" />
-              <ellipse cx="100" cy="100" rx="30" ry="90" />
-              <ellipse cx="100" cy="100" rx="60" ry="90" />
-              <circle cx="100" cy="10" r="3" fill="#ffffff" />
-              <circle cx="100" cy="190" r="3" fill="#ffffff" />
-              <circle cx="10" cy="100" r="3" fill="#ffffff" />
-              <circle cx="190" cy="100" r="3" fill="#ffffff" />
-              <circle cx="70" cy="40" r="2.5" fill="#ffffff" />
-              <circle cx="130" cy="160" r="2.5" fill="#ffffff" />
-              <circle cx="160" cy="70" r="2.5" fill="#ffffff" />
-              <circle cx="40" cy="130" r="2.5" fill="#ffffff" />
-              <circle cx="140" cy="40" r="2" fill="#ffffff" />
-              <circle cx="60" cy="160" r="2" fill="#ffffff" />
-            </g>
-          </svg>
+        {/* Capa 2: ESFERA DE NODOS ANIMADA */}
+        <div
+          className="absolute pointer-events-none z-0"
+          style={{
+            left: `${heroOrb.x}%`,
+            top: `${heroOrb.y}%`,
+            width: "800px",
+            height: "800px",
+            transform: `translate(-50%, -50%) scale(${heroOrb.scale})`,
+            opacity: heroOrb.opacity,
+            transition: heroOrb.isTransitioning
+              ? "opacity 2.5s ease-in-out"
+              : "none",
+          }}
+        >
+          <div className="w-full h-full animate-spin-slow">
+            <svg
+              viewBox="0 0 200 200"
+              className="w-full h-full"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <g stroke="#ffffff" strokeWidth="0.5" fill="none" opacity="0.8">
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="90"
+                  strokeDasharray="2 4"
+                  strokeWidth="0.8"
+                />
+                <ellipse cx="100" cy="100" rx="90" ry="30" />
+                <ellipse cx="100" cy="100" rx="90" ry="60" />
+                <ellipse cx="100" cy="100" rx="30" ry="90" />
+                <ellipse cx="100" cy="100" rx="60" ry="90" />
+                <circle cx="100" cy="10" r="3" fill="#ffffff" />
+                <circle cx="100" cy="190" r="3" fill="#ffffff" />
+                <circle cx="10" cy="100" r="3" fill="#ffffff" />
+                <circle cx="190" cy="100" r="3" fill="#ffffff" />
+                <circle cx="70" cy="40" r="2.5" fill="#ffffff" />
+                <circle cx="130" cy="160" r="2.5" fill="#ffffff" />
+                <circle cx="160" cy="70" r="2.5" fill="#ffffff" />
+                <circle cx="40" cy="130" r="2.5" fill="#ffffff" />
+                <circle cx="140" cy="40" r="2" fill="#ffffff" />
+                <circle cx="60" cy="160" r="2" fill="#ffffff" />
+              </g>
+            </svg>
+          </div>
         </div>
 
+        {/* Capa 3: Filtro Glassmorphism (Cristal Esmerilado) */}
+        <div className="absolute inset-0 backdrop-blur-[4px] bg-white/5 z-0 pointer-events-none"></div>
+
+        {/* Capa 4: Contenido Frontal */}
         <div className="container relative z-10 mx-auto max-w-7xl px-4 md:px-8 text-center text-white">
           <h3 className="text-sm md:text-base font-bold tracking-widest uppercase text-white/80 mb-4 drop-shadow-sm">
             Instituto de Ingenieros Eléctricos y Electrónicos
@@ -363,7 +408,7 @@ export default function HomePage() {
                 >
                   <span className="absolute inset-0 bg-gradient-to-r from-[#5f2167] to-[#98002e] opacity-0 transition-opacity duration-300 group-hover/btn:opacity-100"></span>
                   <span className="relative z-10 px-6 text-sm font-medium text-neutral-900 transition-colors duration-300 group-hover/btn:text-white">
-                    Nuestras Redes
+                    Nuestras Redes (Linktree)
                   </span>
                 </Link>
               </div>
@@ -390,7 +435,7 @@ export default function HomePage() {
                     <svg
                       fill="none"
                       height="24"
-                      shape-rendering="geometricPrecision"
+                      shapeRendering="geometricPrecision"
                       stroke="currentColor"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -419,7 +464,7 @@ export default function HomePage() {
                     <svg
                       fill="none"
                       height="24"
-                      shape-rendering="geometricPrecision"
+                      shapeRendering="geometricPrecision"
                       stroke="currentColor"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -451,7 +496,7 @@ export default function HomePage() {
                     <svg
                       fill="none"
                       height="24"
-                      shape-rendering="geometricPrecision"
+                      shapeRendering="geometricPrecision"
                       stroke="currentColor"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -481,7 +526,7 @@ export default function HomePage() {
                     <svg
                       fill="none"
                       height="24"
-                      shape-rendering="geometricPrecision"
+                      shapeRendering="geometricPrecision"
                       stroke="currentColor"
                       strokeLinecap="round"
                       strokeLinejoin="round"
