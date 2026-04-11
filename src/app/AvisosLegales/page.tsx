@@ -192,8 +192,8 @@ export default function AvisosLegalesPage() {
                 Políticas de Privacidad. El Capítulo Estudiantil se reserva el
                 derecho de actualizar, modificar o enmendar este documento en
                 cualquier momento para cumplir con nuevas directrices de IEEE,
-                UADY o leyes aplicables, siendo la fecha de "Última
-                actualización" el indicador de su vigencia.
+                UADY o leyes aplicables, siendo la fecha de &quot;Última
+                actualización&quot; el indicador de su vigencia.
               </p>
             </CardContent>
           </Card>

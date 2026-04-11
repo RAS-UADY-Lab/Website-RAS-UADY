@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { createBrowserClient } from "@supabase/ssr";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -137,12 +138,12 @@ export default function LoginPage() {
           </div>
         </div>
         <div className="mt-8 text-center">
-          <a
+          <Link
             href="/"
             className="text-sm font-medium text-neutral-500 hover:text-neutral-900 transition-colors"
           >
             &larr; Volver al inicio
-          </a>
+          </Link>
         </div>
       </div>
     </div>

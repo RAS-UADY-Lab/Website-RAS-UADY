@@ -313,7 +313,7 @@ export default function HomePage() {
               </CardHeader>
               <CardContent className="flex-1">
                 <p className="text-sm text-neutral-600 leading-relaxed">
-                  El IEEE está dividido en múltiples "Sociedades"
+                  El IEEE está dividido en múltiples &quot;Sociedades&quot;
                   especializadas. <strong>RAS</strong> (Robotics and Automation
                   Society) es la rama enfocada exclusivamente en la teoría y
                   práctica de la robótica, sistemas de control, IA aplicada y

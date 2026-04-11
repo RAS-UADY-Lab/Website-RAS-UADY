@@ -51,11 +51,6 @@ export default function ActividadesPage() {
 
   // Efecto principal: Carga inicial de datos
   useEffect(() => {
-    // 1. Asignar leyenda aleatoria en el cliente
-    setLeyendaVacia(
-      leyendasVacias[Math.floor(Math.random() * leyendasVacias.length)],
-    );
-
     // 2. Consumir Supabase
     const cargarActividades = async () => {
       setIsLoading(true);
@@ -65,6 +60,11 @@ export default function ActividadesPage() {
         .select("*")
         .eq("es_interna", false) // Filtro maestro de seguridad
         .order("fecha_inicio", { ascending: false });
+
+      // 1. Asignar leyenda aleatoria en el cliente
+      setLeyendaVacia(
+        leyendasVacias[Math.floor(Math.random() * leyendasVacias.length)],
+      );
 
       if (!error && data) {
         // Mapeamos los datos de la base de datos a nuestra interfaz de TypeScript

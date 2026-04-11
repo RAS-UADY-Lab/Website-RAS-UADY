@@ -15,6 +15,27 @@ export const metadata: Metadata = {
   title: "IEEE RAS UADY | Capítulo Estudiantil",
   description:
     "Sitio oficial de la Sociedad de Robótica y Automatización en la Facultad de Ingeniería de la UADY.",
+  icons: {
+    icon: "/IMG/favicon.svg",
+    apple: "/IMG/favicon.svg",
+  },
+  openGraph: {
+    title: "IEEE RAS UADY | Capítulo Estudiantil",
+    description:
+      "Impulsando la innovación, la divulgación y el desarrollo tecnológico en robótica y automatización.",
+    url: "https://ras-uady.ras-fiuady.workers.dev/" /* Sustituir por el dominio final si cambia */,
+    siteName: "IEEE RAS UADY",
+    images: [
+      {
+        url: "/IMG/EVENTS/Default.jpg" /* Imagen que saldrá al compartir el link */,
+        width: 1200,
+        height: 630,
+        alt: "Logo IEEE RAS UADY",
+      },
+    ],
+    locale: "es_MX",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

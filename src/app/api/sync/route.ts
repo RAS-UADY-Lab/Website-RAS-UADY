@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
 // 1. Inicializamos un cliente de Supabase con permisos de Dios (Service Role)
 // Esto es estrictamente necesario para saltarse las reglas de RLS en tareas de fondo
@@ -20,9 +22,36 @@ function extraerEnlaceImagen(texto: string | null) {
   return match ? `https://events.vtools.ieee.org/${match[1]}` : null;
 }
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
-    // 2. URL OFICIAL usando la nueva etiqueta exclusiva "WebRAS"
+    // --- CAPA DE SEGURIDAD ---
+    const authHeader = request.headers.get("authorization");
+    const isCronJob = authHeader === `Bearer ${process.env.CRON_SECRET}`;
+
+    // Si no es Cron Job, verificamos que sea un administrador autenticado desde el frontend
+    if (!isCronJob) {
+      const cookieStore = await cookies();
+      const supabaseAuth = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          cookies: {
+            get(name: string) { return cookieStore.get(name)?.value; },
+          },
+        }
+      );
+      const { data: { session } } = await supabaseAuth.auth.getSession();
+      
+      if (!session) {
+        return NextResponse.json(
+          { exito: false, mensaje: "Acceso denegado. Se requiere autenticación de administrador o clave CRON." },
+          { status: 401 }
+        );
+      }
+    }
+    // --- FIN CAPA DE SEGURIDAD ---
+
+    // 2. URL OFICIAL usando la etiqueta exclusiva
     const vtoolsUrl = "https://events.vtools.ieee.org/feeds/v7/c/SBC03105.json?span=now-3.year~now.1.month&sort=start_time&tags=RAS";
     
     const response = await fetch(vtoolsUrl, { 
@@ -50,7 +79,7 @@ export async function POST() {
         fecha_inicio: attr["start-time"],
         enlace: attr.link,
         imagen_url: extraerEnlaceImagen(attr.header),
-        es_interna: false, // Como usan el tag exclusivo, asumimos que todas son para el público
+        es_interna: false,
         origen: "vtools"
       };
     });
@@ -58,7 +87,6 @@ export async function POST() {
     const vtoolsIds = actividadesNuevas.map((a: any) => a.vtools_id);
 
     // 4. PREVENCIÓN DE ZOMBIS Y SOBRESCRITURAS
-    // Buscamos si estos eventos ya existen en nuestra base de datos para ver su estado
     const { data: eventosExistentes, error: fetchError } = await supabaseAdmin
       .from('actividades')
       .select('vtools_id, oculto, protegido')
@@ -66,23 +94,21 @@ export async function POST() {
 
     if (fetchError) throw fetchError;
 
-    // Creamos mapas de búsqueda rápida
     const mapaOcultos = new Set(eventosExistentes?.filter(e => e.oculto).map(e => e.vtools_id));
     const mapaProtegidos = new Set(eventosExistentes?.filter(e => e.protegido).map(e => e.vtools_id));
 
-    // Filtramos y preparamos la lista final
     const actividadesFinales = actividadesNuevas
-      .filter((act: any) => !mapaProtegidos.has(act.vtools_id)) // Si el admin lo editó (protegido), vTools no lo toca
+      .filter((act: any) => !mapaProtegidos.has(act.vtools_id))
       .map((act: any) => ({
         ...act,
-        oculto: mapaOcultos.has(act.vtools_id) ? true : false // Si el admin lo borró (oculto), se queda oculto
+        oculto: mapaOcultos.has(act.vtools_id) ? true : false
       }));
 
     if (actividadesFinales.length === 0) {
       return NextResponse.json({ exito: true, mensaje: "Todo está al día. No hubo eventos nuevos que actualizar." });
     }
 
-    // 5. UPSERT Atómico usando el cliente Admin
+    // 5. UPSERT Atómico
     const { error } = await supabaseAdmin
       .from('actividades')
       .upsert(actividadesFinales, { 
@@ -98,7 +124,7 @@ export async function POST() {
     });
 
   } catch (error: any) {
-    console.error("❌ ERROR EN EL BACKEND DE SINCRONIZACIÓN:", error.message);
+    console.error("ERROR EN EL BACKEND DE SINCRONIZACIÓN:", error.message);
     
     return NextResponse.json({ 
       exito: false, 

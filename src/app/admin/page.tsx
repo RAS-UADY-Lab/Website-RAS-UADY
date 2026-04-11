@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { createBrowserClient } from "@supabase/ssr";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -298,19 +298,17 @@ export default function AdminDashboard() {
 
       // ACTIVIDADES
       if (modalMode === "crear_act") {
-        const { error } = await supabase
-          .from("actividades")
-          .insert([
-            {
-              titulo: actFormData.titulo,
-              descripcion: actFormData.descripcion,
-              fecha_inicio: new Date(actFormData.fecha).toISOString(),
-              enlace: actFormData.enlace,
-              imagen_url: imageUrl,
-              origen: "manual",
-              es_interna: false,
-            },
-          ]);
+        const { error } = await supabase.from("actividades").insert([
+          {
+            titulo: actFormData.titulo,
+            descripcion: actFormData.descripcion,
+            fecha_inicio: new Date(actFormData.fecha).toISOString(),
+            enlace: actFormData.enlace,
+            imagen_url: imageUrl,
+            origen: "manual",
+            es_interna: false,
+          },
+        ]);
         if (error) throw error;
         toast.success("Actividad creada");
       } else if (modalMode === "editar_act") {
@@ -332,19 +330,17 @@ export default function AdminDashboard() {
 
       // DIRECTIVOS
       else if (modalMode === "crear_dir") {
-        const { error } = await supabase
-          .from("directivos")
-          .insert([
-            {
-              nombre: dirFormData.nombre,
-              puesto: dirFormData.puesto,
-              descripcion: dirFormData.descripcion,
-              periodo: dirFormData.periodo,
-              orden: dirFormData.orden,
-              activo: dirFormData.activo,
-              imagen_url: imageUrl,
-            },
-          ]);
+        const { error } = await supabase.from("directivos").insert([
+          {
+            nombre: dirFormData.nombre,
+            puesto: dirFormData.puesto,
+            descripcion: dirFormData.descripcion,
+            periodo: dirFormData.periodo,
+            orden: dirFormData.orden,
+            activo: dirFormData.activo,
+            imagen_url: imageUrl,
+          },
+        ]);
         if (error) throw error;
         toast.success("Miembro añadido");
       } else if (modalMode === "editar_dir") {
@@ -367,17 +363,15 @@ export default function AdminDashboard() {
 
       // PROYECTOS
       else if (modalMode === "crear_proy") {
-        const { error } = await supabase
-          .from("proyectos")
-          .insert([
-            {
-              titulo: proyFormData.titulo,
-              descripcion: proyFormData.descripcion,
-              tecnologias: proyFormData.tecnologias,
-              enlace: proyFormData.enlace,
-              imagen_url: imageUrl,
-            },
-          ]);
+        const { error } = await supabase.from("proyectos").insert([
+          {
+            titulo: proyFormData.titulo,
+            descripcion: proyFormData.descripcion,
+            tecnologias: proyFormData.tecnologias,
+            enlace: proyFormData.enlace,
+            imagen_url: imageUrl,
+          },
+        ]);
         if (error) throw error;
         toast.success("Proyecto añadido");
       } else if (modalMode === "editar_proy") {
@@ -398,17 +392,15 @@ export default function AdminDashboard() {
 
       // PATROCINADORES
       else if (modalMode === "crear_pat") {
-        const { error } = await supabase
-          .from("patrocinadores")
-          .insert([
-            {
-              nombre: patFormData.nombre,
-              nivel: patFormData.nivel,
-              enlace: patFormData.enlace,
-              activo: patFormData.activo,
-              logo_url: imageUrl,
-            },
-          ]);
+        const { error } = await supabase.from("patrocinadores").insert([
+          {
+            nombre: patFormData.nombre,
+            nivel: patFormData.nivel,
+            enlace: patFormData.enlace,
+            activo: patFormData.activo,
+            logo_url: imageUrl,
+          },
+        ]);
         if (error) throw error;
         toast.success("Patrocinador añadido");
       } else if (modalMode === "editar_pat") {
