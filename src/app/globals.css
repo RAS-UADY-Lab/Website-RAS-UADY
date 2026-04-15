@@ -50,37 +50,6 @@
   }
 }
 
-/* --- SCROLLBAR CORPORATIVA (DEGRADADO) --- */
-/* Chrome, Edge y Safari */
-::-webkit-scrollbar {
-  width: 8px; /* Muy delgada y elegante */
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  /* Fondo neutral clarito que combina con el slate-50 del fondo principal */
-  background-color: #f8fafc;
-}
-
-::-webkit-scrollbar-thumb {
-  /* Aquí ocurre la magia: El degradado oficial de arriba hacia abajo */
-  background-image: linear-gradient(to bottom, #5f2167, #98002e);
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  /* Invertimos los colores al pasar el cursor para dar una respuesta táctil visual */
-  background-image: linear-gradient(to bottom, #98002e, #5f2167);
-}
-
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  /* Nota: Firefox aún no soporta degradados en su motor de scroll nativo.
-     Usamos el rojo vino sólido como un fallback elegante. */
-  scrollbar-color: #98002e #f8fafc;
-}
-
 /* --- ICONOS --- */
 @font-face {
   font-family: "PersonalIconCollection";

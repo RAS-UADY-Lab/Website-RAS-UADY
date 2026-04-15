@@ -200,7 +200,7 @@ export default function ActividadesPage() {
                     >
                       <span className="absolute inset-0 bg-gradient-to-r from-[#5f2167] to-[#98002e] opacity-0 transition-opacity duration-300 group-hover/btn:opacity-100"></span>
                       <span className="relative z-10 px-6 text-sm font-medium text-neutral-900 transition-colors duration-300 group-hover/btn:text-white">
-                        Ver detalles en vTools
+                        Ver Detalles
                       </span>
                     </Link>
                   </CardContent>
