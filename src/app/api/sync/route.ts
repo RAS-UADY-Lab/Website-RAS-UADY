@@ -78,7 +78,7 @@ export async function POST(request: Request) {
     // --- FIN CAPA DE SEGURIDAD ---
 
     // 2. URL OFICIAL usando la etiqueta exclusiva
-    const vtoolsUrl = "https://events.vtools.ieee.org/feeds/v7/c/SBC03105.json?span=now-3.year~now.1.month&sort=start_time&tags=RAS";
+    const vtoolsUrl = "https://events.vtools.ieee.org/feeds/v7/c/SBC03105.json?span=now-3.year~now.1.month&sort=start_time&tags=WebRAS";
     
     const response = await fetch(vtoolsUrl, { 
       cache: 'no-store', 

@@ -408,7 +408,7 @@ export default function HomePage() {
                 >
                   <span className="absolute inset-0 bg-gradient-to-r from-[#5f2167] to-[#98002e] opacity-0 transition-opacity duration-300 group-hover/btn:opacity-100"></span>
                   <span className="relative z-10 px-6 text-sm font-medium text-neutral-900 transition-colors duration-300 group-hover/btn:text-white">
-                    Nuestras Redes (Linktree)
+                    Nuestras Redes
                   </span>
                 </Link>
               </div>
@@ -540,7 +540,7 @@ export default function HomePage() {
                 </summary>
                 <div className="p-5 pt-0 text-sm text-neutral-600 leading-relaxed border-t border-neutral-100 mt-2 bg-slate-50/50">
                   Participar a nivel local (dentro de la UADY) como oyente,
-                  staff o en talleres introductorios es{" "}
+                  staff o en talleres introductorios suele ser{" "}
                   <strong>completamente gratuito</strong>. Sin embargo, si
                   deseas obtener la certificación internacional, acceder a
                   becas, credencial oficial, correos @ieee.org y participar en

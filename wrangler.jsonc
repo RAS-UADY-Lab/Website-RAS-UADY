@@ -1,27 +1,30 @@
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"main": ".open-next/worker.js",
-	"name": "ras-uady",
-	"compatibility_date": "2026-04-10",
-	"compatibility_flags": [
-		"nodejs_compat",
-		"global_fetch_strictly_public"
-	],
-	"assets": {
-		"directory": ".open-next/assets",
-		"binding": "ASSETS"
-	},
-	"services": [
-		{
-			// Self-reference service binding, the service name must match the worker name
-			// see https://opennext.js.org/cloudflare/caching
-			"binding": "WORKER_SELF_REFERENCE",
-			"service": "ras-uady"
-		}
-	],
-	"images": {
-		// Enable image optimization
-		// see https://opennext.js.org/cloudflare/howtos/image
-		"binding": "IMAGES"
-	}
+    "$schema": "node_modules/wrangler/config-schema.json",
+    "main": ".open-next/worker.js",
+    "name": "ras-uady",
+    "compatibility_date": "2026-04-10",
+    "compatibility_flags": [
+        "nodejs_compat",
+        "global_fetch_strictly_public"
+    ],
+    "assets": {
+        "directory": ".open-next/assets",
+        "binding": "ASSETS"
+    },
+    "services": [
+        {
+            "binding": "WORKER_SELF_REFERENCE",
+            "service": "ras-uady"
+        }
+    ],
+    "images": {
+        "binding": "IMAGES"
+    },
+    "vars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "https://rvasisdsvafihnugbsvs.supabase.co",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_oghZ3LYRREwyuosu-NvLgw_-_WTuvEn",
+        "ADMIN_EMAILS": "ras.fiuady@gmail.com,eduardochan_cach@hotmail.com",
+        "CONTACT_EMAIL": "ras.fiuady@gmail.com",
+        "SENDER_EMAIL": "onboarding@resend.dev"
+    }
 }
