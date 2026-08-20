@@ -437,7 +437,7 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-4 md:gap-5">
               <div className="flex-shrink-0 bg-slate-50 p-2 rounded-xl border border-neutral-200 shadow-sm">
                 <Image
-                  src="/IMG/favicon.svg"
+                  src="favicon.svg"
                   alt="Favicon RAS"
                   width={40}
                   height={40}
@@ -549,7 +549,7 @@ export default function AdminDashboard() {
                           Fecha
                         </th>
                         <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
-                          Estado
+                          Origen
                         </th>
                         <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap text-right">
                           Acciones
