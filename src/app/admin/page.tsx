@@ -515,7 +515,6 @@ export default function AdminDashboard() {
                 </button>
               </div>
 
-              {/* Botones de acción 100% ancho en móvil */}
               <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
                 <button
                   onClick={() => openModal("crear_act")}
@@ -539,7 +538,6 @@ export default function AdminDashboard() {
 
             <Card className="card-brand ring-0 border border-neutral-200 bg-white min-h-[400px]">
               <CardContent className="p-0">
-                {/* Scroll horizontal forzado en móvil */}
                 <div className="overflow-x-auto w-full">
                   <table className="w-full text-sm text-left text-neutral-600">
                     <thead className="text-xs text-neutral-500 uppercase bg-slate-50 border-b border-neutral-200">
@@ -636,7 +634,7 @@ export default function AdminDashboard() {
                                     </button>
                                     <button
                                       onClick={() =>
-                                        openModal("eliminar_act", {
+                                        openModal("eliminar_soft", {
                                           ...act,
                                           tabla: "actividades",
                                         })
@@ -647,18 +645,31 @@ export default function AdminDashboard() {
                                     </button>
                                   </>
                                 ) : (
-                                  <button
-                                    onClick={() =>
-                                      toggleVisibility(
-                                        "actividades",
-                                        act.id,
-                                        false,
-                                      )
-                                    }
-                                    className="text-emerald-600 hover:text-emerald-700 font-medium cursor-pointer"
-                                  >
-                                    Restaurar
-                                  </button>
+                                  <>
+                                    <button
+                                      onClick={() =>
+                                        toggleVisibility(
+                                          "actividades",
+                                          act.id,
+                                          false,
+                                        )
+                                      }
+                                      className="text-emerald-600 hover:text-emerald-700 font-medium cursor-pointer"
+                                    >
+                                      Restaurar
+                                    </button>
+                                    <button
+                                      onClick={() =>
+                                        openModal("eliminar_dir", {
+                                          ...act,
+                                          tabla: "actividades",
+                                        })
+                                      }
+                                      className="text-neutral-400 hover:text-red-600 font-medium cursor-pointer"
+                                    >
+                                      Eliminar
+                                    </button>
+                                  </>
                                 )}
                               </td>
                             </tr>
@@ -888,7 +899,7 @@ export default function AdminDashboard() {
                                     </button>
                                     <button
                                       onClick={() =>
-                                        openModal("eliminar_act", {
+                                        openModal("eliminar_soft", {
                                           ...proy,
                                           tabla: "proyectos",
                                         })
@@ -899,18 +910,31 @@ export default function AdminDashboard() {
                                     </button>
                                   </>
                                 ) : (
-                                  <button
-                                    onClick={() =>
-                                      toggleVisibility(
-                                        "proyectos",
-                                        proy.id,
-                                        false,
-                                      )
-                                    }
-                                    className="text-emerald-600 hover:text-emerald-700 font-medium cursor-pointer"
-                                  >
-                                    Restaurar
-                                  </button>
+                                  <>
+                                    <button
+                                      onClick={() =>
+                                        toggleVisibility(
+                                          "proyectos",
+                                          proy.id,
+                                          false,
+                                        )
+                                      }
+                                      className="text-emerald-600 hover:text-emerald-700 font-medium cursor-pointer"
+                                    >
+                                      Restaurar
+                                    </button>
+                                    <button
+                                      onClick={() =>
+                                        openModal("eliminar_dir", {
+                                          ...proy,
+                                          tabla: "proyectos",
+                                        })
+                                      }
+                                      className="text-neutral-400 hover:text-red-600 font-medium cursor-pointer"
+                                    >
+                                      Eliminar
+                                    </button>
+                                  </>
                                 )}
                               </td>
                             </tr>
@@ -1034,7 +1058,7 @@ export default function AdminDashboard() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
           <div className="bg-white rounded-2xl w-full max-w-md p-5 sm:p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
             {/* Soft Delete (Ocultar) - Reutilizado para Actividades y Proyectos */}
-            {modalMode === "eliminar_act" && (
+            {modalMode === "eliminar_soft" && (
               <div className="text-center">
                 <h3 className="text-xl font-bold text-neutral-900 mb-2">
                   ¿Ocultar elemento?

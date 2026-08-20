@@ -26,6 +26,8 @@ export default function Navbar() {
     };
   }, [isOpen]);
 
+  if (pathname === "/enlaces") return null;
+
   return (
     <>
       <header className="sticky top-4 z-50 mx-auto w-[95%] max-w-7xl rounded-2xl border border-neutral-200/60 bg-white/85 backdrop-blur-md shadow-sm shadow-neutral-900/5 transition-all">
@@ -73,33 +75,34 @@ export default function Navbar() {
             >
               Membresía
             </Link>
+            <Link
+              href="/contacto"
+              className="text-sm font-medium nav-link-fluid cursor-pointer"
+            >
+              Contacto
+            </Link>
           </nav>
 
           {/* Botones de Acción */}
           <div className="flex items-center gap-3">
             {/* Botón Destacado: Nodum App */}
             <Link
-              href="https://mynodum.vercel.app"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/nodum"
+              target="_self"
               className="hidden md:inline-flex h-9 items-center justify-center rounded-md border border-neutral-200 bg-slate-50 px-4 py-2 text-sm font-bold shadow-sm transition-all duration-300 hover:bg-white hover:shadow-md hover:border-neutral-300 cursor-pointer group relative"
             >
-              <i className="icon-Laptop mr-2 text-neutral-500 group-hover:text-[#5f2167] transition-colors"></i>
+              <i className="icon-nodum-logo mr-2 text-neutral-500 group-hover:text-[#5f2167] transition-colors"></i>
               <span className="text-neutral-700 group-hover:bg-gradient-to-r group-hover:from-[#5f2167] group-hover:to-[#98002e] group-hover:bg-clip-text group-hover:text-transparent transition-all">
                 Nodum
-              </span>
-              <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#98002e] opacity-50"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#98002e]"></span>
               </span>
             </Link>
 
             {/* Botón Unirme Desktop */}
             <Link
-              href="/contacto"
+              href="/#Unirme"
               className="hidden md:inline-flex h-9 items-center justify-center rounded-md bg-gradient-to-r from-[#5f2167] to-[#98002e] px-5 py-2 text-sm font-medium text-white shadow-sm transition-all duration-300 hover:shadow-md hover:opacity-90 hover:-translate-y-[1px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 cursor-pointer ml-1"
             >
-              <i className="icon-trato mr-2 text-lg"></i> Unirme
+              <i className="icon-handshake-solid-full mr-2 text-lg"></i> Unirme
             </Link>
 
             {/* Botón Menú Móvil */}
@@ -109,7 +112,7 @@ export default function Navbar() {
               aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
             >
               <i
-                className={`text-neutral-900 text-xl transition-transform duration-300 ${isOpen ? "icon-Cruz rotate-90" : "icon-MenuHam"}`}
+                className={`text-neutral-900 text-xl transition-transform duration-300 ${isOpen ? "icon-close rotate-90" : "icon-bars"}`}
               ></i>
             </button>
           </div>
@@ -170,7 +173,7 @@ export default function Navbar() {
             onClick={() => setIsOpen(false)}
             className="w-full max-w-xs inline-flex h-12 items-center justify-center rounded-md border border-neutral-200 bg-slate-50 px-4 py-2 text-base font-bold shadow-sm cursor-pointer group"
           >
-            <i className="icon-Laptop mr-2 text-neutral-500"></i>
+            <i className="icon-nodum-logo mr-2 text-neutral-500"></i>
             <span className="text-neutral-700">Nodum App</span>
           </Link>
 
@@ -179,7 +182,7 @@ export default function Navbar() {
             onClick={() => setIsOpen(false)}
             className="w-full max-w-xs inline-flex h-12 items-center justify-center rounded-md bg-gradient-to-r from-[#5f2167] to-[#98002e] px-5 py-2 text-base font-medium text-white shadow-md cursor-pointer"
           >
-            <i className="icon-trato mr-2 text-xl"></i> Unirme al Capítulo
+            <i className="icon-handshake-solid-full mr-2 text-xl"></i> Unirme al Capítulo
           </Link>
         </nav>
       </div>

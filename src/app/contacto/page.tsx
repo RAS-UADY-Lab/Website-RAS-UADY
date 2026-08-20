@@ -109,7 +109,7 @@ export default function ContactoPage() {
                 <Card className="group card-brand ring-0 transition-all duration-300 hover:-translate-y-1">
                   <CardContent className="flex items-center gap-5 p-5">
                     <div className="flex items-center justify-center w-10">
-                      <i className="icon-Mail text-3xl text-neutral-400 transition-all duration-300 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-t group-hover:from-[#5f2167] group-hover:to-[#98002e]"></i>
+                      <i className="icon-envelope text-3xl text-neutral-400 transition-all duration-300 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-t group-hover:from-[#5f2167] group-hover:to-[#98002e]"></i>
                     </div>
                     <div>
                       <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest transition-colors duration-300 group-hover:text-neutral-500">
@@ -132,7 +132,7 @@ export default function ContactoPage() {
                 <Card className="group card-brand ring-0 transition-all duration-300 hover:-translate-y-1">
                   <CardContent className="flex items-center gap-5 p-5">
                     <div className="flex items-center justify-center w-10">
-                      <i className="icon-WhatsApp text-3xl text-neutral-400 transition-all duration-300 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-t group-hover:from-[#5f2167] group-hover:to-[#98002e]"></i>
+                      <i className="icon-whatsapp-brands-solid-full text-3xl text-neutral-400 transition-all duration-300 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-t group-hover:from-[#5f2167] group-hover:to-[#98002e]"></i>
                     </div>
                     <div>
                       <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest transition-colors duration-300 group-hover:text-neutral-500">
@@ -155,7 +155,7 @@ export default function ContactoPage() {
                 <Card className="group card-brand ring-0 transition-all duration-300 hover:-translate-y-1">
                   <CardContent className="flex items-center gap-5 p-5">
                     <div className="flex items-center justify-center w-10">
-                      <i className="icon-mapa text-3xl text-neutral-400 transition-all duration-300 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-t group-hover:from-[#5f2167] group-hover:to-[#98002e]"></i>
+                      <i className="icon-map-location-dot text-3xl text-neutral-400 transition-all duration-300 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-t group-hover:from-[#5f2167] group-hover:to-[#98002e]"></i>
                     </div>
                     <div>
                       <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest transition-colors duration-300 group-hover:text-neutral-500">
@@ -179,7 +179,7 @@ export default function ContactoPage() {
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-12 h-12 rounded-md border border-neutral-200 bg-white text-neutral-400 shadow-sm transition-all duration-300 hover:border-transparent hover:shadow-md hover:-translate-y-1 hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-t hover:from-[#5f2167] hover:to-[#98002e] cursor-pointer"
                 >
-                  <i className="icon-Facebook2 text-2xl"></i>
+                  <i className="icon-facebook text-2xl"></i>
                 </a>
                 <a
                   href="https://www.instagram.com/ras.uady/"
@@ -187,15 +187,15 @@ export default function ContactoPage() {
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-12 h-12 rounded-md border border-neutral-200 bg-white text-neutral-400 shadow-sm transition-all duration-300 hover:border-transparent hover:shadow-md hover:-translate-y-1 hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-t hover:from-[#5f2167] hover:to-[#98002e] cursor-pointer"
                 >
-                  <i className="icon-Instagram1 text-2xl"></i>
+                  <i className="icon-instagram text-2xl"></i>
                 </a>
                 <a
-                  href="https://linktr.ee/RAS.UADY"
+                  href="/enlaces"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-12 h-12 rounded-md border border-neutral-200 bg-white text-neutral-400 shadow-sm transition-all duration-300 hover:border-transparent hover:shadow-md hover:-translate-y-1 hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-t hover:from-[#5f2167] hover:to-[#98002e] cursor-pointer"
                 >
-                  <i className="icon-LinkExterno text-2xl"></i>
+                  <i className="icon-arrow-up-right-from-square text-2xl"></i>
                 </a>
               </div>
             </div>

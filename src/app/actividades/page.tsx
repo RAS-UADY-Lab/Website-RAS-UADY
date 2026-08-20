@@ -59,6 +59,7 @@ export default function ActividadesPage() {
         .from("actividades")
         .select("*")
         .eq("es_interna", false) // Filtro maestro de seguridad
+        .eq("oculto", false)
         .order("fecha_inicio", { ascending: false });
 
       // 1. Asignar leyenda aleatoria en el cliente
@@ -156,7 +157,7 @@ export default function ActividadesPage() {
           {isLoading ? (
             <div className="flex justify-center items-center py-20">
               <span className="text-neutral-500 font-medium flex items-center">
-                <span className="animate-spin text-2xl mr-3">⚙</span> Cargando
+                <i className="icon-spinner animate-spin text-2xl mr-3"></i> Cargando
                 agenda...
               </span>
             </div>
@@ -217,7 +218,7 @@ export default function ActividadesPage() {
               </h3>
               <p className="text-neutral-600 mb-8">{leyendaVacia}</p>
               <Link
-                href="https://linktr.ee/RAS.UADY"
+                href="/enlaces"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group/btn relative inline-flex h-10 items-center justify-center rounded-md overflow-hidden border border-neutral-300 shadow-sm transition-all duration-300 hover:border-transparent hover:shadow-md cursor-pointer"
@@ -266,7 +267,7 @@ export default function ActividadesPage() {
                       <CardTitle className="text-lg text-fluid-gradient leading-tight">
                         {actividad.titulo}
                       </CardTitle>
-                      <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest mt-2">
+                      <p className="text-s text-neutral-400 tracking-widest mt-2">
                         {formatearFecha(actividad.fechaInicio)}
                       </p>
                     </CardHeader>

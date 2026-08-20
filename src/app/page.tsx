@@ -226,7 +226,7 @@ export default function HomePage() {
 
         {/* Capa 4: Contenido Frontal */}
         <div className="container relative z-10 mx-auto max-w-7xl px-4 md:px-8 text-center text-white">
-          <h3 className="text-sm md:text-base font-bold tracking-widest uppercase text-white/80 mb-4 drop-shadow-sm">
+          <h3 className="text-sm md:text-base font-bold tracking-widest text-white/80 mb-4 drop-shadow-sm">
             Instituto de Ingenieros Eléctricos y Electrónicos
           </h3>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6 drop-shadow-md">
@@ -313,7 +313,7 @@ export default function HomePage() {
             <Card className="group card-brand ring-0 flex flex-col h-full bg-white transition-all duration-300 hover:-translate-y-1">
               <CardHeader className="pb-4">
                 <div className="w-12 h-12 rounded-lg bg-neutral-100 group-hover:bg-gradient-to-r group-hover:from-[#5f2167]/10 group-hover:to-[#98002e]/10 text-neutral-400 flex items-center justify-center mb-4 border border-neutral-200 transition-colors duration-300">
-                  <i className="icon-Info text-2xl group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#5f2167] group-hover:to-[#98002e] transition-all duration-300"></i>
+                  <i className="icon-circle-info-solid-full text-2xl group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#5f2167] group-hover:to-[#98002e] transition-all duration-300"></i>
                 </div>
                 <CardTitle className="text-xl font-bold text-fluid-gradient">
                   ¿Qué es IEEE?
@@ -350,7 +350,7 @@ export default function HomePage() {
             <Card className="group card-brand ring-0 flex flex-col h-full bg-white transition-all duration-300 hover:-translate-y-1">
               <CardHeader className="pb-4">
                 <div className="w-12 h-12 rounded-lg bg-neutral-100 group-hover:bg-gradient-to-r group-hover:from-[#5f2167]/10 group-hover:to-[#98002e]/10 text-neutral-400 flex items-center justify-center mb-4 border border-neutral-200 transition-colors duration-300">
-                  <i className="icon-CodLaptop text-2xl group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#5f2167] group-hover:to-[#98002e] transition-all duration-300"></i>
+                  <i className="icon-laptop text-2xl group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#5f2167] group-hover:to-[#98002e] transition-all duration-300"></i>
                 </div>
                 <CardTitle className="text-xl font-bold text-fluid-gradient">
                   ¿Qué es RAS?
@@ -384,7 +384,7 @@ export default function HomePage() {
             <Card className="group card-brand ring-0 flex flex-col h-full bg-white transition-all duration-300 hover:-translate-y-1">
               <CardHeader className="pb-4">
                 <div className="w-12 h-12 rounded-lg bg-neutral-100 group-hover:bg-gradient-to-r group-hover:from-[#5f2167]/10 group-hover:to-[#98002e]/10 text-neutral-400 flex items-center justify-center mb-4 border border-neutral-200 transition-colors duration-300">
-                  <i className="icon-Casa text-2xl group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#5f2167] group-hover:to-[#98002e] transition-all duration-300"></i>
+                  <i className="icon-home text-2xl group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#5f2167] group-hover:to-[#98002e] transition-all duration-300"></i>
                 </div>
                 <CardTitle className="text-xl font-bold text-fluid-gradient">
                   El Capítulo en UADY
@@ -401,7 +401,7 @@ export default function HomePage() {
               </CardContent>
               <div className="p-6 pt-0 mt-auto">
                 <Link
-                  href="https://linktr.ee/RAS.UADY"
+                  href="/enlaces"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group/btn relative inline-flex w-full h-10 items-center justify-center rounded-md overflow-hidden border border-neutral-300 shadow-sm transition-all duration-300 hover:border-transparent hover:shadow-md cursor-pointer"
@@ -479,9 +479,9 @@ export default function HomePage() {
                 <div className="p-5 pt-0 text-sm text-neutral-600 leading-relaxed border-t border-neutral-100 mt-2 bg-slate-50/50">
                   Tu nivel de involucramiento lo decides tú. Como{" "}
                   <strong>miembro casual</strong>, solo recibes información de
-                  nuestros eventos. Como <strong>miembro formal o staff</strong>
+                  nuestros eventos y decides cuándo participar en ellos. Como <strong>miembro formal o staff</strong>
                   , te comprometes a apoyar en la logística de eventos, aportar
-                  ideas para proyectos técnicos y asistir a las asambleas cuando
+                  ideas para proyectos técnicos y asistir a las reuniones cuando
                   tu horario de clases te lo permita.
                 </div>
               </details>
@@ -545,8 +545,8 @@ export default function HomePage() {
                   deseas obtener la certificación internacional, acceder a
                   becas, credencial oficial, correos @ieee.org y participar en
                   competencias globales, deberás adquirir la{" "}
-                  <strong>Membresía Anual IEEE Estudiantil</strong>, la cual se
-                  paga directamente a la plataforma global de IEEE.
+                  <strong>Membresía Anual IEEE Estudiantil</strong> y la <strong> Membresía Anual IEEE RAS Estudiantil</strong>, las cuales se
+                  pagan directamente en la plataforma global de IEEE.
                 </div>
               </details>
             </div>
@@ -831,7 +831,7 @@ export default function HomePage() {
       )}
 
       {/* SECCIÓN: ÚNETE AL CAPÍTULO */}
-      <section className="bg-white py-20 border-t border-neutral-100">
+      <section className="bg-white py-20 border-t border-neutral-100" id="Unirme">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mb-12 text-center max-w-3xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-t from-[#5f2167] to-[#98002e] bg-clip-text text-transparent">
@@ -839,7 +839,7 @@ export default function HomePage() {
             </h2>
             <p className="mt-4 text-neutral-600">
               Hay varias formas de participar en las actividades RAS: desde
-              asistir como oyente o público, hasta involucrarte como voluntario
+              asistir como oyente, hasta involucrarte como voluntario
               o staff. Explora las oportunidades y aprovecha la que mejor se
               adapte a ti.
             </p>

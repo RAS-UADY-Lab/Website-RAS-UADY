@@ -70,7 +70,7 @@ export default function NosotrosPage() {
           <p className="text-lg md:text-xl text-neutral-600 leading-relaxed">
             El capítulo está formado por estudiantes de la Facultad de
             Ingeniería de la Universidad Autónoma de Yucatán y sus actividades
-            están destinadas a toda la comunidad estudiantil del Campus de
+            están abiertas a toda la comunidad estudiantil del Campus de
             Ciencias Exactas e Ingenierías.
           </p>
         </div>
@@ -156,7 +156,7 @@ export default function NosotrosPage() {
                     <CardTitle className="text-xl text-fluid-gradient">
                       {dir.nombre}
                     </CardTitle>
-                    <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest mt-1">
+                    <p className="text-s text-neutral-400 tracking-widest mt-1">
                       {dir.puesto}
                     </p>
                   </CardHeader>

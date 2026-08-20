@@ -25,7 +25,7 @@ export default function MembresiaPage() {
             <h2 className="text-xl font-bold text-neutral-900 mb-3">
               ¿Cómo funciona la afiliación?
             </h2>
-            <p className="text-neutral-600 text-sm leading-relaxed mb-6 text-pretty">
+            <p className="text-neutral-600 leading-relaxed mb-6 text-pretty">
               La suscripción RAS es de segundo nivel; requiere contar
               previamente con la membresía base de IEEE. Ambas se gestionan
               mediante el portal oficial. Si configuras tu perfil como
@@ -76,9 +76,9 @@ export default function MembresiaPage() {
                   Recursos técnicos de alto nivel
                 </h3>
                 <p className="text-neutral-600 leading-relaxed text-lg text-pretty">
-                  Acceso directo a artículos, publicaciones científicas y
+                  Acceso al catálogo de artículos, publicaciones científicas y
                   revistas especializadas como{" "}
-                  <em>IEEE Robotics & Automation Magazine</em> y{" "}
+                  <em>IEEE Robotics & Automation Magazine</em> o{" "}
                   <em>IEEE Transactions on Robotics</em>. Mantente a la
                   vanguardia consultando bibliotecas digitales con contenido
                   exclusivo para miembros.
@@ -106,7 +106,7 @@ export default function MembresiaPage() {
                 <p className="text-neutral-600 leading-relaxed text-lg text-pretty">
                   Gana el derecho de representar al Capítulo Estudiantil FIUADY
                   en competencias internacionales como el{" "}
-                  <em>IEEE Robotics Competition</em> y <em>RAS Challenges</em>.
+                  <em>IEEE Robotics Competition</em>, <em>RAS Challenges</em> o <em>IEEEXtreme</em>.
                   Además, tu membresía te habilita para solicitar fondos
                   institucionales y becas de financiamiento para tus propios
                   proyectos.

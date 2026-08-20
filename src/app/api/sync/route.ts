@@ -43,18 +43,14 @@ function extraerEnlaceImagen(texto: string | null) {
 
 export async function POST(request: Request) {
   try {
-    // 1. INICIALIZACIÓN DEL CLIENTE (Debe estar AQUÍ adentro para que Cloudflare no explote al compilar)
-    // Esto es estrictamente necesario para saltarse las reglas de RLS en tareas de fondo
     const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY! 
     );
 
-    // --- CAPA DE SEGURIDAD ---
     const authHeader = request.headers.get("authorization");
     const isCronJob = authHeader === `Bearer ${process.env.CRON_SECRET}`;
 
-    // Si no es Cron Job, verificamos que sea un administrador autenticado desde el frontend
     if (!isCronJob) {
       const cookieStore = await cookies();
       const supabaseAuth = createServerClient(
@@ -75,9 +71,8 @@ export async function POST(request: Request) {
         );
       }
     }
-    // --- FIN CAPA DE SEGURIDAD ---
 
-    // 2. URL OFICIAL usando la etiqueta exclusiva
+    // URL OFICIAL usando la etiqueta exclusiva para el fetch
     const vtoolsUrl = "https://events.vtools.ieee.org/feeds/v7/c/SBC03105.json?span=now-3.year~now.1.month&sort=start_time&tags=WebRAS";
     
     const response = await fetch(vtoolsUrl, { 
