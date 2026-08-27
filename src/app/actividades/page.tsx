@@ -11,6 +11,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { supabase } from "@/lib/supabase"; // Importación fundamental
+import Reveal from "@/components/ui/Reveal";
 
 // --- TIPOS DE DATOS ---
 interface Actividad {
@@ -133,14 +134,19 @@ export default function ActividadesPage() {
       {/* HEADER DE SECCIÓN */}
       <section className="bg-white pt-32 pb-12 md:pt-40 md:pb-16 border-b border-neutral-100">
         <div className="container mx-auto max-w-4xl px-4 md:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight bg-gradient-to-t from-[#5f2167] to-[#98002e] bg-clip-text text-transparent mb-6">
-            Nuestras Actividades
-          </h1>
-          <p className="text-lg md:text-xl text-neutral-600 leading-relaxed max-w-2xl mx-auto">
-            Disfruta de las diferentes actividades que traemos para la comunidad
-            estudiantil del Campus de Ciencias Exactas e Ingenierías. Conoce
-            aquí los próximos eventos o explora los que ya realizamos.
-          </p>
+          <Reveal delay={0}>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight bg-gradient-to-t from-[#5f2167] to-[#98002e] bg-clip-text text-transparent mb-6">
+              Nuestras Actividades
+            </h1>
+          </Reveal>
+          <Reveal delay={0}>
+            <p className="text-lg md:text-xl text-neutral-600 leading-relaxed max-w-2xl mx-auto">
+              Disfruta de las diferentes actividades que traemos para la
+              comunidad estudiantil del Campus de Ciencias Exactas e
+              Ingenierías. Conoce aquí los próximos eventos o explora los que ya
+              realizamos.
+            </p>
+          </Reveal>
         </div>
       </section>
 
@@ -148,86 +154,97 @@ export default function ActividadesPage() {
       <section className="bg-slate-50 py-16 md:py-24 border-b border-neutral-100 min-h-[400px]">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mb-12 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-t from-[#5f2167] to-[#98002e] bg-clip-text text-transparent">
-              Próximos Eventos
-            </h2>
-            <div className="h-1 w-16 bg-gradient-to-r from-[#5f2167] to-[#98002e] mx-auto mt-4 rounded-full"></div>
+            <Reveal delay={0}>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-t from-[#5f2167] to-[#98002e] bg-clip-text text-transparent">
+                Próximos Eventos
+              </h2>
+            </Reveal>
+            <Reveal delay={0}>
+              <div className="h-1 w-16 bg-gradient-to-r from-[#5f2167] to-[#98002e] mx-auto mt-4 rounded-full"></div>
+            </Reveal>
           </div>
 
           {isLoading ? (
             <div className="flex justify-center items-center py-20">
               <span className="text-neutral-500 font-medium flex items-center">
-                <i className="icon-spinner animate-spin text-2xl mr-3"></i> Cargando
-                agenda...
+                <i className="icon-spinner animate-spin text-2xl mr-3"></i>{" "}
+                Cargando agenda...
               </span>
             </div>
           ) : proximosEventos.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {proximosEventos.map((actividad) => (
-                <Card
-                  key={actividad.id}
-                  className="group card-brand ring-0 flex flex-col h-full transition-all duration-300 hover:-translate-y-1"
-                >
-                  <div className="relative h-48 w-full bg-neutral-100 rounded-t-xl overflow-hidden">
-                    <FallbackImage
-                      src={actividad.imagenUrl || "/IMG/EVENTS/Default.jpg"}
-                      alt={actividad.titulo}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    {revisarHoy(actividad.fechaInicio) && (
-                      <div className="absolute top-4 right-4 bg-gradient-to-r from-[#5f2167] to-[#98002e] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md animate-pulse">
-                        ¡Es hoy!
-                      </div>
-                    )}
-                  </div>
-                  <CardHeader>
-                    <CardTitle className="text-xl text-fluid-gradient">
-                      {actividad.titulo}
-                    </CardTitle>
-                    <p className="text-xs font-bold text-neutral-500 uppercase tracking-widest mt-1">
-                      {formatearFecha(actividad.fechaInicio)}
-                    </p>
-                  </CardHeader>
-                  <CardContent className="flex-1 flex flex-col">
-                    <CardDescription className="text-sm text-neutral-600 mb-6 flex-1 line-clamp-3">
-                      {actividad.descripcion}
-                    </CardDescription>
-                    <Link
-                      href={actividad.enlace}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group/btn relative inline-flex w-full h-10 items-center justify-center rounded-md overflow-hidden border border-neutral-300 shadow-sm transition-all duration-300 hover:border-transparent hover:shadow-md mt-auto cursor-pointer"
-                    >
-                      <span className="absolute inset-0 bg-gradient-to-r from-[#5f2167] to-[#98002e] opacity-0 transition-opacity duration-300 group-hover/btn:opacity-100"></span>
-                      <span className="relative z-10 px-6 text-sm font-medium text-neutral-900 transition-colors duration-300 group-hover/btn:text-white">
-                        Ver Detalles
-                      </span>
-                    </Link>
-                  </CardContent>
-                </Card>
+                <Reveal key={actividad.id} delay={0} className="h-full">
+                  <Card className="group card-brand ring-0 flex flex-col h-full transition-all duration-300 hover:-translate-y-1">
+                    <div className="relative h-48 w-full shrink-0 bg-neutral-100 rounded-t-xl overflow-hidden">
+                      <FallbackImage
+                        src={actividad.imagenUrl || "/IMG/EVENTS/Default.jpg"}
+                        alt={actividad.titulo}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      {revisarHoy(actividad.fechaInicio) && (
+                        <div className="absolute top-4 right-4 bg-gradient-to-r from-[#5f2167] to-[#98002e] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md animate-pulse">
+                          ¡Es hoy!
+                        </div>
+                      )}
+                    </div>
+                    <CardHeader>
+                      <CardTitle className="text-xl text-fluid-gradient">
+                        {actividad.titulo}
+                      </CardTitle>
+                      <p className="text-xs font-bold text-neutral-500 uppercase tracking-widest mt-1">
+                        {formatearFecha(actividad.fechaInicio)}
+                      </p>
+                    </CardHeader>
+                    <CardContent className="flex-1 flex flex-col">
+                      <CardDescription className="text-sm text-neutral-600 mb-6 flex-1 line-clamp-3">
+                        {actividad.descripcion}
+                      </CardDescription>
+                      <Link
+                        href={actividad.enlace}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group/btn relative inline-flex w-full h-10 items-center justify-center rounded-md overflow-hidden border border-neutral-300 shadow-sm transition-all duration-300 hover:border-transparent hover:shadow-md mt-auto cursor-pointer"
+                      >
+                        <span className="absolute inset-0 bg-gradient-to-r from-[#5f2167] to-[#98002e] opacity-0 transition-opacity duration-300 group-hover/btn:opacity-100"></span>
+                        <span className="relative z-10 px-6 text-sm font-medium text-neutral-900 transition-colors duration-300 group-hover/btn:text-white">
+                          Ver Detalles
+                        </span>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                </Reveal>
               ))}
             </div>
           ) : (
             <div className="max-w-2xl mx-auto text-center bg-white border border-neutral-200 rounded-2xl p-10 shadow-sm">
-              <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <i className="icon-calendar text-2xl text-neutral-400"></i>
-              </div>
-              <h3 className="text-xl font-bold text-neutral-900 mb-3">
-                Agenda vacía, ¡por ahora!
-              </h3>
-              <p className="text-neutral-600 mb-8">{leyendaVacia}</p>
-              <Link
-                href="/enlaces"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group/btn relative inline-flex h-10 items-center justify-center rounded-md overflow-hidden border border-neutral-300 shadow-sm transition-all duration-300 hover:border-transparent hover:shadow-md cursor-pointer"
-              >
-                <span className="absolute inset-0 bg-gradient-to-r from-[#5f2167] to-[#98002e] opacity-0 transition-opacity duration-300 group-hover/btn:opacity-100"></span>
-                <span className="relative z-10 px-8 text-sm font-medium text-neutral-900 transition-colors duration-300 group-hover/btn:text-white">
-                  ¡Síguenos en redes!
-                </span>
-              </Link>
+              <Reveal delay={0}>
+                <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <i className="icon-calendar text-2xl text-neutral-400"></i>
+                </div>
+              </Reveal>
+              <Reveal delay={0}>
+                <h3 className="text-xl font-bold text-neutral-900 mb-3">
+                  Agenda vacía, ¡por ahora!
+                </h3>
+              </Reveal>
+              <Reveal delay={0}>
+                <p className="text-neutral-600 mb-8">{leyendaVacia}</p>
+              </Reveal>
+              <Reveal delay={0}>
+                <Link
+                  href="/enlaces"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group/btn relative inline-flex h-10 items-center justify-center rounded-md overflow-hidden border border-neutral-300 shadow-sm transition-all duration-300 hover:border-transparent hover:shadow-md cursor-pointer"
+                >
+                  <span className="absolute inset-0 bg-gradient-to-r from-[#5f2167] to-[#98002e] opacity-0 transition-opacity duration-300 group-hover/btn:opacity-100"></span>
+                  <span className="relative z-10 px-8 text-sm font-medium text-neutral-900 transition-colors duration-300 group-hover/btn:text-white">
+                    ¡Síguenos en redes!
+                  </span>
+                </Link>
+              </Reveal>
             </div>
           )}
         </div>
@@ -237,50 +254,57 @@ export default function ActividadesPage() {
       <section className="bg-white py-16 md:py-24">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mb-12 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-t from-[#5f2167] to-[#98002e] bg-clip-text text-transparent">
-              Eventos Anteriores
-            </h2>
-            <div className="h-1 w-16 bg-gradient-to-r from-[#5f2167] to-[#98002e] mx-auto mt-4 rounded-full"></div>
+            <Reveal delay={0}>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-t from-[#5f2167] to-[#98002e] bg-clip-text text-transparent">
+                Eventos Anteriores
+              </h2>
+            </Reveal>
+            <Reveal delay={0}>
+              <div className="h-1 w-16 bg-gradient-to-r from-[#5f2167] to-[#98002e] mx-auto mt-4 rounded-full"></div>
+            </Reveal>
           </div>
 
           {!isLoading && eventosAnteriores.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {eventosAnteriores.map((actividad) => (
-                <a
-                  href={actividad.enlace}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  key={actividad.id}
-                  className="block"
-                >
-                  <Card className="group card-brand ring-0 h-full transition-all duration-300 hover:-translate-y-1 cursor-pointer">
-                    <div className="relative h-48 w-full bg-neutral-100 rounded-t-xl overflow-hidden">
-                      <FallbackImage
-                        src={actividad.imagenUrl || "/IMG/EVENTS/Default.jpg"}
-                        alt={actividad.titulo}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10"></div>
-                    </div>
-                    <CardHeader>
-                      <CardTitle className="text-lg text-fluid-gradient leading-tight">
-                        {actividad.titulo}
-                      </CardTitle>
-                      <p className="text-s text-neutral-400 tracking-widest mt-2">
-                        {formatearFecha(actividad.fechaInicio)}
-                      </p>
-                    </CardHeader>
-                  </Card>
-                </a>
+                <Reveal key={actividad.id} delay={0} className="h-full">
+                  <a
+                    href={actividad.enlace}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block h-full"
+                  >
+                    <Card className="group card-brand ring-0 h-full flex flex-col transition-all duration-300 hover:-translate-y-1 cursor-pointer">
+                      <div className="relative h-48 w-full shrink-0 bg-neutral-100 rounded-t-xl overflow-hidden">
+                        <FallbackImage
+                          src={actividad.imagenUrl || "/IMG/EVENTS/Default.jpg"}
+                          alt={actividad.titulo}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10"></div>
+                      </div>
+                      <CardHeader className="flex-1">
+                        <CardTitle className="text-lg text-fluid-gradient leading-tight">
+                          {actividad.titulo}
+                        </CardTitle>
+                        <p className="text-s text-neutral-400 tracking-widest mt-2">
+                          {formatearFecha(actividad.fechaInicio)}
+                        </p>
+                      </CardHeader>
+                    </Card>
+                  </a>
+                </Reveal>
               ))}
             </div>
           )}
 
           {!isLoading && eventosAnteriores.length === 0 && (
-            <p className="text-center text-neutral-500">
-              No hay registro de eventos anteriores por el momento.
-            </p>
+            <Reveal delay={0}>
+              <p className="text-center text-neutral-500">
+                No hay registro de eventos anteriores por el momento.
+              </p>
+            </Reveal>
           )}
         </div>
       </section>

@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/admin/', '/api/'], /* Protege el panel y las rutas de backend de Google */
     },
-    sitemap: 'https://ras-uady.ras-fiuady.workers.dev/sitemap.xml',
+    sitemap: 'https://rasuady.com/sitemap.xml',
   }
 }

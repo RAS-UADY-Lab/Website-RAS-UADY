@@ -11,6 +11,6 @@ jobs:
     steps:
       - name: Llamar a la API de Sincronización
         run: |
-          curl -X POST https://ras-uady.ras-fiuady.workers.dev/api/sync \
+          curl -X POST https://rasuady.com \
           -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
           -H "Content-Type: application/json"

@@ -12,7 +12,6 @@ function Card({
       data-slot="card"
       data-size={size}
       className={cn(
-        // ELIMINAMOS overflow-hidden de esta línea
         "group/card flex flex-col gap-6 rounded-xl bg-card pb-6 text-sm text-card-foreground shadow-xs ring-1 ring-foreground/10 data-[size=sm]:gap-4 data-[size=sm]:pb-4 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
         className,
       )}

@@ -158,6 +158,10 @@
   }
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 .icon-phone:before {
   content: "\e9fd";
 }

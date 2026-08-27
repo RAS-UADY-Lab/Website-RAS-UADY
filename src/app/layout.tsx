@@ -3,8 +3,8 @@ import { Montserrat } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/ui/Navbar";
 import Footer from "@/components/ui/Footer";
+import PageTransition from "@/components/ui/PageTransition";
 
-// Configuración de tipografía Montserrat
 const montserrat = Montserrat({
   subsets: ["latin"],
   weight: ["400", "500", "700", "800"],
@@ -12,7 +12,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://ras-uady.ras-fiuady.workers.dev"),
+  metadataBase: new URL("https://rasuady.com"),
   title: "IEEE RAS UADY | Capítulo Estudiantil",
   description:
     "Sitio oficial de la Sociedad de Robótica y Automatización en la Facultad de Ingeniería de la UADY.",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     title: "IEEE RAS UADY | Capítulo Estudiantil",
     description:
       "Impulsando la innovación, la divulgación y el desarrollo tecnológico en robótica y automatización.",
-    url: "https://ras-uady.ras-fiuady.workers.dev/",
+    url: "https://rasuady.com",
     siteName: "IEEE RAS UADY",
     images: [
       {
@@ -57,11 +57,11 @@ export default function RootLayout({
       <body
         className={`${montserrat.className} min-h-screen flex flex-col bg-slate-50`}
       >
-        {/* Componente de navegación */}
         <Navbar />
 
-        {/* Contenido principal */}
-        <main className="flex-1 -mt-20">{children}</main>
+        <main className="flex-1 -mt-20">
+          <PageTransition>{children}</PageTransition>
+        </main>
 
         <Footer />
       </body>

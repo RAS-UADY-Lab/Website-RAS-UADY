@@ -1,5 +1,6 @@
 {
     "$schema": "node_modules/wrangler/config-schema.json",
+    "account_id": "81764fe86d4f398afbbd072b16911586",
     "main": ".open-next/worker.js",
     "name": "ras-uady",
     "compatibility_date": "2026-04-10",
