@@ -157,6 +157,16 @@ export default function Footer() {
                   </Link>
                 </li>
               </Reveal>
+              <Reveal delay={0}>
+                <li>
+                  <Link
+                    href="/CABR"
+                    className="text-sm font-medium text-white/60 hover:text-white transition-colors duration-300 cursor-pointer flex items-center justify-center md:justify-start gap-2"
+                  >
+                    Concurso Anual de Batalla de Robots
+                  </Link>
+                </li>
+              </Reveal>
             </ul>
           </div>
 

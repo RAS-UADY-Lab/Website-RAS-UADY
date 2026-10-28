@@ -51,37 +51,55 @@ export default function Navbar() {
 
           {/* Navegación Desktop */}
           <nav className="hidden md:flex gap-8">
-            <Link href="/" className="text-sm font-medium nav-link-fluid cursor-pointer">
+            <Link
+              href="/"
+              className="text-sm font-medium nav-link-fluid cursor-pointer"
+            >
               Inicio
             </Link>
-            <Link href="/nosotros" className="text-sm font-medium nav-link-fluid cursor-pointer">
+            <Link
+              href="/nosotros"
+              className="text-sm font-medium nav-link-fluid cursor-pointer"
+            >
               Nosotros
             </Link>
-            <Link href="/actividades" className="text-sm font-medium nav-link-fluid cursor-pointer">
+            <Link
+              href="/actividades"
+              className="text-sm font-medium nav-link-fluid cursor-pointer"
+            >
               Actividades
             </Link>
-            <Link href="/proyectos" className="text-sm font-medium nav-link-fluid cursor-pointer">
+            <Link
+              href="/proyectos"
+              className="text-sm font-medium nav-link-fluid cursor-pointer"
+            >
               Proyectos
             </Link>
-            <Link href="/membresia" className="text-sm font-medium nav-link-fluid cursor-pointer">
+            <Link
+              href="/membresia"
+              className="text-sm font-medium nav-link-fluid cursor-pointer"
+            >
               Membresía
             </Link>
-            <Link href="/contacto" className="text-sm font-medium nav-link-fluid cursor-pointer">
+            <Link
+              href="/contacto"
+              className="text-sm font-medium nav-link-fluid cursor-pointer"
+            >
               Contacto
             </Link>
           </nav>
 
           {/* Botones de Acción */}
           <div className="flex items-center gap-3">
-            {/* Botón Destacado: Nodum App */}
+            {/* Botón Destacado: Nodum App o CABR (Concurso Anual de Batalla de Robots)*/}
             <Link
-              href="/nodum"
+              href="/CABR"
               target="_self"
               className="hidden md:inline-flex h-9 items-center justify-center rounded-md border border-neutral-200 bg-slate-50 px-4 py-2 text-sm font-bold shadow-sm transition-all duration-300 hover:bg-white hover:shadow-md hover:border-neutral-300 cursor-pointer group relative"
             >
-              <i className="icon-nodum-logo mr-2 text-neutral-500 group-hover:text-[#5f2167] transition-colors"></i>
+              <i className="icon-gear mr-2 text-neutral-500 group-hover:text-[#5f2167] transition-colors"></i>
               <span className="text-neutral-700 group-hover:bg-gradient-to-r group-hover:from-[#5f2167] group-hover:to-[#98002e] group-hover:bg-clip-text group-hover:text-transparent transition-all">
-                Nodum
+                CABR
               </span>
             </Link>
 
@@ -154,7 +172,9 @@ export default function Navbar() {
                 aria-current={isActive ? "page" : undefined}
                 style={{ transitionDelay: isOpen ? `${idx * 40}ms` : "0ms" }}
                 className={`group flex items-center justify-between rounded-2xl px-5 py-4 text-base font-semibold transition-all duration-300 ${
-                  isOpen ? "translate-x-0 opacity-100" : "-translate-x-2 opacity-0"
+                  isOpen
+                    ? "translate-x-0 opacity-100"
+                    : "-translate-x-2 opacity-0"
                 } ${
                   isActive
                     ? "bg-gradient-to-r from-[#5f2167]/[0.06] to-[#98002e]/[0.06] text-fluid-gradient"
@@ -185,13 +205,13 @@ export default function Navbar() {
 
           <div className="flex flex-col gap-2 p-2">
             <Link
-              href="/nodum"
+              href="/CABR"
               target="_self"
               onClick={() => setIsOpen(false)}
               className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-200 bg-slate-50 px-4 text-sm font-bold text-neutral-700 shadow-sm transition-colors hover:bg-white"
             >
-              <i className="icon-nodum-logo mr-2 text-neutral-500"></i>
-              Nodum App
+              <i className="icon-gear mr-2 text-neutral-500"></i>
+              CABR
             </Link>
             <Link
               href="/#Unirme"
