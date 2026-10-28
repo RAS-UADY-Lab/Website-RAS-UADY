@@ -95,11 +95,13 @@ export default function Navbar() {
             <Link
               href="/CABR"
               target="_self"
+              title="2do Concurso Anual de Batalla de Robots UADY"
               className="hidden md:inline-flex h-9 items-center justify-center rounded-md border border-neutral-200 bg-slate-50 px-4 py-2 text-sm font-bold shadow-sm transition-all duration-300 hover:bg-white hover:shadow-md hover:border-neutral-300 cursor-pointer group relative"
             >
               <i className="icon-gear mr-2 text-neutral-500 group-hover:text-[#5f2167] transition-colors"></i>
               <span className="text-neutral-700 group-hover:bg-gradient-to-r group-hover:from-[#5f2167] group-hover:to-[#98002e] group-hover:bg-clip-text group-hover:text-transparent transition-all">
-                CABR
+                <span className="hidden lg:inline">Batalla de Robots</span>
+                <span className="lg:hidden">CABR</span>
               </span>
             </Link>
 
@@ -211,7 +213,7 @@ export default function Navbar() {
               className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-200 bg-slate-50 px-4 text-sm font-bold text-neutral-700 shadow-sm transition-colors hover:bg-white"
             >
               <i className="icon-gear mr-2 text-neutral-500"></i>
-              CABR
+              Batalla de Robots
             </Link>
             <Link
               href="/#Unirme"

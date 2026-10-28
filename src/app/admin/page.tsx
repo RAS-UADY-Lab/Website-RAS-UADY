@@ -1,6 +1,7 @@
+//src/app/admin/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { createBrowserClient } from "@supabase/ssr";
@@ -13,6 +14,7 @@ interface ActividadAdmin {
   descripcion: string;
   enlace: string;
   fecha_inicio: string;
+  imagen_url: string | null;
   origen: "vtools" | "manual";
   es_interna: boolean;
   oculto: boolean;
@@ -50,11 +52,87 @@ interface PatrocinadorAdmin {
   activo: boolean;
 }
 
+type ModuloPrincipal =
+  | "actividades"
+  | "directivos"
+  | "proyectos"
+  | "patrocinadores";
+type ModuloFormulario = "act" | "dir" | "proy" | "pat";
+
+// --- CONSTANTES ---
+const BUCKET_IMAGENES = "imagenes";
+const TAMANO_MAXIMO_IMAGEN = 2 * 1024 * 1024;
+const ZONA_HORARIA = "America/Mexico_City";
+const EXTENSIONES_POR_MIME: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+};
+
+/** Cliente de navegador que persiste la sesión en cookies. */
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+);
+
+// --- UTILIDADES ---
+
+/**
+ * Convierte un instante ISO al formato local que exige <input type="datetime-local">.
+ * Evita el desfase de zona horaria que produce recortar la cadena UTC.
+ */
+const aInputLocal = (iso: string) => {
+  const fecha = new Date(iso);
+  const dos = (n: number) => String(n).padStart(2, "0");
+  return `${fecha.getFullYear()}-${dos(fecha.getMonth() + 1)}-${dos(fecha.getDate())}T${dos(fecha.getHours())}:${dos(fecha.getMinutes())}`;
+};
+
+/** Obtiene la ruta interna del bucket a partir de una URL pública; devuelve null si la URL es externa. */
+const extraerRutaStorage = (url?: string | null) => {
+  if (!url) return null;
+  const marcador = `/storage/v1/object/public/${BUCKET_IMAGENES}/`;
+  const indice = url.indexOf(marcador);
+  if (indice === -1) return null;
+  return decodeURIComponent(url.slice(indice + marcador.length).split("?")[0]);
+};
+
+const mensajeDeError = (error: unknown, porDefecto: string) => {
+  if (
+    error &&
+    typeof error === "object" &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
+    return error.message;
+  }
+  return porDefecto;
+};
+
+const subirImagen = async (file: File) => {
+  const ruta = `${crypto.randomUUID()}.${EXTENSIONES_POR_MIME[file.type]}`;
+  const { error } = await supabase.storage
+    .from(BUCKET_IMAGENES)
+    .upload(ruta, file, {
+      contentType: file.type,
+      cacheControl: "31536000",
+      upsert: false,
+    });
+  if (error) throw error;
+  return supabase.storage.from(BUCKET_IMAGENES).getPublicUrl(ruta).data
+    .publicUrl;
+};
+
+/** Eliminación best-effort: un fallo de limpieza no debe revertir la operación principal. */
+const eliminarImagen = async (url?: string | null) => {
+  const ruta = extraerRutaStorage(url);
+  if (!ruta) return;
+  const { error } = await supabase.storage.from(BUCKET_IMAGENES).remove([ruta]);
+  if (error) console.error("No se pudo eliminar la imagen:", error.message);
+};
+
 export default function AdminDashboard() {
   // --- ESTADOS GLOBALES ---
-  const [mainTab, setMainTab] = useState<
-    "actividades" | "directivos" | "proyectos" | "patrocinadores"
-  >("actividades");
+  const [mainTab, setMainTab] = useState<ModuloPrincipal>("actividades");
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -106,14 +184,9 @@ export default function AdminDashboard() {
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  );
-
   // --- CARGA DE DATOS ---
-  const fetchData = async () => {
-    setIsLoading(true);
+  const fetchData = useCallback(async (silencioso = false) => {
+    if (!silencioso) setIsLoading(true);
     const [resActs, resDirs, resProys, resPats] = await Promise.all([
       supabase
         .from("actividades")
@@ -143,11 +216,11 @@ export default function AdminDashboard() {
     else setPatrocinadores(resPats.data || []);
 
     setIsLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -158,12 +231,12 @@ export default function AdminDashboard() {
   const handleImageSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return setImageFile(null);
-    if (!file.type.startsWith("image/")) {
+    if (!(file.type in EXTENSIONES_POR_MIME)) {
       toast.error("Formato inválido. Selecciona una imagen (JPG, PNG, WebP).");
       e.target.value = "";
       return setImageFile(null);
     }
-    if (file.size > 2 * 1024 * 1024) {
+    if (file.size > TAMANO_MAXIMO_IMAGEN) {
       toast.error("La imagen es muy pesada. El límite es 2MB.");
       e.target.value = "";
       return setImageFile(null);
@@ -171,36 +244,30 @@ export default function AdminDashboard() {
     setImageFile(file);
   };
 
-  const subirImagen = async (file: File) => {
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${Math.random()}.${fileExt}`;
-    const { error } = await supabase.storage
-      .from("imagenes")
-      .upload(fileName, file);
-    if (error) throw error;
-    return supabase.storage.from("imagenes").getPublicUrl(fileName).data
-      .publicUrl;
-  };
-
   const handleSyncVTools = async () => {
     setIsSyncing(true);
     const syncPromise = fetch("/api/sync", { method: "POST" }).then(
       async (res) => {
-        const data = await res.json();
-        if (!res.ok || !data.exito)
-          throw new Error(data.mensaje || "Error en el servidor");
+        const data = await res.json().catch(() => null);
+        if (!res.ok || !data?.exito)
+          throw new Error(data?.mensaje || "Error en el servidor");
         return data;
       },
     );
     toast.promise(syncPromise, {
       loading: "Descargando eventos...",
-      success: (data) => {
-        fetchData();
-        return data.mensaje;
-      },
+      success: (data) => data.mensaje,
       error: (err) => `Error: ${err.message}`,
     });
-    syncPromise.finally(() => setIsSyncing(false));
+
+    try {
+      await syncPromise;
+      await fetchData(true);
+    } catch {
+      // El detalle del error ya se notifica mediante toast.promise.
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   // --- ACCIONES DIRECTAS EN TABLAS ---
@@ -209,44 +276,79 @@ export default function AdminDashboard() {
     id: string,
     ocultar: boolean,
   ) => {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from(tabla)
       .update({ oculto: ocultar })
-      .eq("id", id);
-    if (error) toast.error(`Error al actualizar ${tabla}.`);
-    else {
-      toast.success(ocultar ? "Movido a la papelera" : "Restaurado con éxito");
-      fetchData();
-      setIsModalOpen(false);
+      .eq("id", id)
+      .select("id");
+
+    if (error || !data?.length) {
+      toast.error(`No se pudo actualizar ${tabla}.`);
+      return;
     }
+    toast.success(ocultar ? "Movido a la papelera" : "Restaurado con éxito");
+    setIsModalOpen(false);
+    fetchData(true);
   };
 
   const toggleDestacada = async (id: string, estadoActual: boolean) => {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("actividades")
       .update({ destacada: !estadoActual })
-      .eq("id", id);
-    if (error) toast.error("Error al destacar evento.");
-    else {
-      toast.success(
-        !estadoActual
-          ? "Actividad marcada como destacada"
-          : "Actividad ya no es destacada",
-      );
-      fetchData();
+      .eq("id", id)
+      .select("id");
+
+    if (error || !data?.length) {
+      toast.error("Error al destacar evento.");
+      return;
     }
+    toast.success(
+      !estadoActual
+        ? "Actividad marcada como destacada"
+        : "Actividad ya no es destacada",
+    );
+    fetchData(true);
   };
 
-  const deleteRecord = async (tabla: string, id: string) => {
-    setIsSubmitting(true);
-    const { error } = await supabase.from(tabla).delete().eq("id", id);
-    setIsSubmitting(false);
-    if (error) toast.error(`Error al eliminar registro.`);
-    else {
-      toast.success("Registro eliminado permanentemente");
-      fetchData();
-      setIsModalOpen(false);
+  /** Revierte el bloqueo aplicado al editar para que vTools vuelva a gobernar los datos del evento. */
+  const quitarProteccion = async (id: string) => {
+    const { data, error } = await supabase
+      .from("actividades")
+      .update({ protegido: false })
+      .eq("id", id)
+      .select("id");
+
+    if (error || !data?.length) {
+      toast.error("No se pudo retirar la protección.");
+      return;
     }
+    toast.success(
+      "Protección retirada. Los datos se restaurarán en la próxima sincronización.",
+    );
+    fetchData(true);
+  };
+
+  const deleteRecord = async (
+    tabla: string,
+    id: string,
+    imagenUrl?: string | null,
+  ) => {
+    setIsSubmitting(true);
+    const { data, error } = await supabase
+      .from(tabla)
+      .delete()
+      .eq("id", id)
+      .select("id");
+    setIsSubmitting(false);
+
+    if (error || !data?.length) {
+      toast.error("No se pudo eliminar el registro.");
+      return;
+    }
+    await eliminarImagen(imagenUrl);
+    toast.success("Registro eliminado permanentemente");
+    setIsModalOpen(false);
+    fetchData(true);
   };
 
   // --- MANEJO DE MODALES Y FORMULARIOS ---
@@ -254,14 +356,16 @@ export default function AdminDashboard() {
     setModalMode(mode);
     setSelectedItem(item);
     setImageFile(null);
-    if (mode.includes("_act"))
+
+    const modulo = mode.split("_")[1];
+    if (modulo === "act")
       setActFormData({
         titulo: item?.titulo || "",
-        fecha: item ? item.fecha_inicio.substring(0, 16) : "",
+        fecha: item ? aInputLocal(item.fecha_inicio) : "",
         enlace: item?.enlace || "",
         descripcion: item?.descripcion || "",
       });
-    if (mode.includes("_dir"))
+    if (modulo === "dir")
       setDirFormData({
         nombre: item?.nombre || "",
         puesto: item?.puesto || "",
@@ -270,14 +374,14 @@ export default function AdminDashboard() {
         orden: item?.orden || 0,
         activo: item?.activo !== false,
       });
-    if (mode.includes("_proy"))
+    if (modulo === "proy")
       setProyFormData({
         titulo: item?.titulo || "",
         descripcion: item?.descripcion || "",
         tecnologias: item?.tecnologias || "",
         enlace: item?.enlace || "",
       });
-    if (mode.includes("_pat"))
+    if (modulo === "pat")
       setPatFormData({
         nombre: item?.nombre || "",
         nivel: item?.nivel || "Aliado",
@@ -290,141 +394,109 @@ export default function AdminDashboard() {
   const handleDynamicSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    try {
-      let imageUrl = undefined;
-      if (imageFile) imageUrl = await subirImagen(imageFile);
+    let imagenNueva: string | undefined;
 
-      // ACTIVIDADES
-      if (modalMode === "crear_act") {
-        const { error } = await supabase.from("actividades").insert([
-          {
+    try {
+      const esEdicion = modalMode.startsWith("editar_");
+      const modulo = modalMode.split("_")[1] as ModuloFormulario;
+      if (imageFile) imagenNueva = await subirImagen(imageFile);
+
+      let tabla: string;
+      let campoImagen = "imagen_url";
+      let payload: Record<string, unknown>;
+      let mensaje: string;
+
+      switch (modulo) {
+        case "act":
+          tabla = "actividades";
+          payload = {
             titulo: actFormData.titulo,
             descripcion: actFormData.descripcion,
             fecha_inicio: new Date(actFormData.fecha).toISOString(),
             enlace: actFormData.enlace,
-            imagen_url: imageUrl,
-            origen: "manual",
-            es_interna: false,
-          },
-        ]);
-        if (error) throw error;
-        toast.success("Actividad creada");
-      } else if (modalMode === "editar_act") {
-        const updates: any = {
-          titulo: actFormData.titulo,
-          descripcion: actFormData.descripcion,
-          fecha_inicio: new Date(actFormData.fecha).toISOString(),
-          enlace: actFormData.enlace,
-          protegido: true,
-        };
-        if (imageUrl) updates.imagen_url = imageUrl;
-        const { error } = await supabase
-          .from("actividades")
-          .update(updates)
-          .eq("id", selectedItem.id);
-        if (error) throw error;
-        toast.success("Actividad actualizada");
-      }
-
-      // DIRECTIVOS
-      else if (modalMode === "crear_dir") {
-        const { error } = await supabase.from("directivos").insert([
-          {
+            ...(esEdicion
+              ? { protegido: true }
+              : { origen: "manual", es_interna: false }),
+          };
+          mensaje = esEdicion ? "Actividad actualizada" : "Actividad creada";
+          break;
+        case "dir":
+          tabla = "directivos";
+          payload = {
             nombre: dirFormData.nombre,
             puesto: dirFormData.puesto,
             descripcion: dirFormData.descripcion,
             periodo: dirFormData.periodo,
             orden: dirFormData.orden,
             activo: dirFormData.activo,
-            imagen_url: imageUrl,
-          },
-        ]);
-        if (error) throw error;
-        toast.success("Miembro añadido");
-      } else if (modalMode === "editar_dir") {
-        const updates: any = {
-          nombre: dirFormData.nombre,
-          puesto: dirFormData.puesto,
-          descripcion: dirFormData.descripcion,
-          periodo: dirFormData.periodo,
-          orden: dirFormData.orden,
-          activo: dirFormData.activo,
-        };
-        if (imageUrl) updates.imagen_url = imageUrl;
-        const { error } = await supabase
-          .from("directivos")
-          .update(updates)
-          .eq("id", selectedItem.id);
-        if (error) throw error;
-        toast.success("Miembro actualizado");
-      }
-
-      // PROYECTOS
-      else if (modalMode === "crear_proy") {
-        const { error } = await supabase.from("proyectos").insert([
-          {
+          };
+          mensaje = esEdicion ? "Miembro actualizado" : "Miembro añadido";
+          break;
+        case "proy":
+          tabla = "proyectos";
+          payload = {
             titulo: proyFormData.titulo,
             descripcion: proyFormData.descripcion,
             tecnologias: proyFormData.tecnologias,
             enlace: proyFormData.enlace,
-            imagen_url: imageUrl,
-          },
-        ]);
-        if (error) throw error;
-        toast.success("Proyecto añadido");
-      } else if (modalMode === "editar_proy") {
-        const updates: any = {
-          titulo: proyFormData.titulo,
-          descripcion: proyFormData.descripcion,
-          tecnologias: proyFormData.tecnologias,
-          enlace: proyFormData.enlace,
-        };
-        if (imageUrl) updates.imagen_url = imageUrl;
-        const { error } = await supabase
-          .from("proyectos")
-          .update(updates)
-          .eq("id", selectedItem.id);
-        if (error) throw error;
-        toast.success("Proyecto actualizado");
-      }
-
-      // PATROCINADORES
-      else if (modalMode === "crear_pat") {
-        const { error } = await supabase.from("patrocinadores").insert([
-          {
+          };
+          mensaje = esEdicion ? "Proyecto actualizado" : "Proyecto añadido";
+          break;
+        case "pat":
+          tabla = "patrocinadores";
+          campoImagen = "logo_url";
+          payload = {
             nombre: patFormData.nombre,
             nivel: patFormData.nivel,
             enlace: patFormData.enlace,
             activo: patFormData.activo,
-            logo_url: imageUrl,
-          },
-        ]);
-        if (error) throw error;
-        toast.success("Patrocinador añadido");
-      } else if (modalMode === "editar_pat") {
-        const updates: any = {
-          nombre: patFormData.nombre,
-          nivel: patFormData.nivel,
-          enlace: patFormData.enlace,
-          activo: patFormData.activo,
-        };
-        if (imageUrl) updates.logo_url = imageUrl;
-        const { error } = await supabase
-          .from("patrocinadores")
-          .update(updates)
-          .eq("id", selectedItem.id);
-        if (error) throw error;
-        toast.success("Patrocinador actualizado");
+          };
+          mensaje = esEdicion
+            ? "Patrocinador actualizado"
+            : "Patrocinador añadido";
+          break;
+        default:
+          throw new Error("Operación no reconocida.");
       }
 
-      fetchData();
+      if (imagenNueva) payload[campoImagen] = imagenNueva;
+
+      const { data, error } = esEdicion
+        ? await supabase
+            .from(tabla)
+            .update(payload)
+            .eq("id", selectedItem.id)
+            .select("id")
+        : await supabase.from(tabla).insert([payload]).select("id");
+
+      if (error) throw error;
+      if (!data?.length)
+        throw new Error("No se aplicó ningún cambio. Verifica tus permisos.");
+
+      if (esEdicion && imagenNueva)
+        await eliminarImagen(selectedItem?.[campoImagen]);
+
+      toast.success(mensaje);
       setIsModalOpen(false);
-    } catch (error: any) {
-      toast.error(error.message);
+      fetchData(true);
+    } catch (error) {
+      if (imagenNueva) await eliminarImagen(imagenNueva);
+      toast.error(mensajeDeError(error, "Error al guardar los cambios."));
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // --- DATOS DERIVADOS ---
+  const actividadesFiltradas = actividades.filter((a) =>
+    actTabInfo === "activas" ? !a.oculto : a.oculto,
+  );
+  const proyectosFiltrados = proyectos.filter((p) =>
+    proyTabInfo === "activos" ? !p.oculto : p.oculto,
+  );
+  const moduloModal = modalMode.split("_")[1];
+  const esFormulario =
+    modalMode.startsWith("crear_") || modalMode.startsWith("editar_");
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-slate-50">
@@ -437,7 +509,7 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-4 md:gap-5">
               <div className="flex-shrink-0 bg-slate-50 p-2 rounded-xl border border-neutral-200 shadow-sm">
                 <Image
-                  src="favicon.svg"
+                  src="/favicon.svg"
                   alt="Favicon RAS"
                   width={40}
                   height={40}
@@ -471,7 +543,7 @@ export default function AdminDashboard() {
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setMainTab(tab.id as any)}
+                onClick={() => setMainTab(tab.id as ModuloPrincipal)}
                 className={`whitespace-nowrap px-4 py-3 md:px-5 md:py-2.5 text-sm font-bold transition-colors cursor-pointer border-b-2 ${
                   mainTab === tab.id
                     ? "border-[#98002e] text-[#98002e]"
@@ -540,7 +612,7 @@ export default function AdminDashboard() {
               <CardContent className="p-0">
                 <div className="overflow-x-auto w-full">
                   <table className="w-full text-sm text-left text-neutral-600">
-                    <thead className="text-xs text-neutral-500 uppercase bg-slate-50 border-b border-neutral-200">
+                    <thead className="text-xs text-neutral-500 bg-slate-50 border-b border-neutral-200">
                       <tr>
                         <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
                           Actividad
@@ -566,9 +638,7 @@ export default function AdminDashboard() {
                             Cargando...
                           </td>
                         </tr>
-                      ) : actividades.filter((a) =>
-                          actTabInfo === "activas" ? !a.oculto : a.oculto,
-                        ).length === 0 ? (
+                      ) : actividadesFiltradas.length === 0 ? (
                         <tr>
                           <td
                             colSpan={4}
@@ -578,102 +648,105 @@ export default function AdminDashboard() {
                           </td>
                         </tr>
                       ) : (
-                        actividades
-                          .filter((a) =>
-                            actTabInfo === "activas" ? !a.oculto : a.oculto,
-                          )
-                          .map((act) => (
-                            <tr key={act.id} className="hover:bg-slate-50">
-                              <td className="px-4 md:px-6 py-3 md:py-4 font-medium text-neutral-900 whitespace-nowrap">
-                                {act.titulo.length > 35
-                                  ? act.titulo.substring(0, 35) + "..."
-                                  : act.titulo}
-                                {act.destacada && (
-                                  <span className="ml-2 text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold">
-                                    ★ Destacada
-                                  </span>
-                                )}
-                                {act.protegido && (
-                                  <span className="ml-2 text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
-                                    Protegido
-                                  </span>
-                                )}
-                              </td>
-                              <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
-                                {new Date(act.fecha_inicio).toLocaleDateString(
-                                  "es-MX",
-                                )}
-                              </td>
-                              <td className="px-4 md:px-6 py-3 md:py-4 uppercase text-[11px] font-bold whitespace-nowrap">
-                                {act.origen}
-                              </td>
-                              <td className="px-4 md:px-6 py-3 md:py-4 text-right space-x-3 whitespace-nowrap">
-                                {actTabInfo === "activas" ? (
-                                  <>
+                        actividadesFiltradas.map((act) => (
+                          <tr key={act.id} className="hover:bg-slate-50">
+                            <td className="px-4 md:px-6 py-3 md:py-4 font-medium text-neutral-900 whitespace-nowrap">
+                              {act.titulo.length > 35
+                                ? act.titulo.substring(0, 35) + "..."
+                                : act.titulo}
+                              {act.destacada && (
+                                <span className="ml-2 text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold">
+                                  ★ Destacada
+                                </span>
+                              )}
+                              {act.protegido && (
+                                <span className="ml-2 text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                                  Protegido
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                              {new Date(act.fecha_inicio).toLocaleDateString(
+                                "es-MX",
+                                { timeZone: ZONA_HORARIA },
+                              )}
+                            </td>
+                            <td className="px-4 md:px-6 py-3 md:py-4 text-[11px] font-bold whitespace-nowrap">
+                              {act.origen === "vtools" ? "vTools" : "Manual"}
+                            </td>
+                            <td className="px-4 md:px-6 py-3 md:py-4 text-right space-x-3 whitespace-nowrap">
+                              {actTabInfo === "activas" ? (
+                                <>
+                                  <button
+                                    onClick={() =>
+                                      toggleDestacada(act.id, act.destacada)
+                                    }
+                                    className={`text-[11px] font-bold px-2 py-1 rounded cursor-pointer transition-colors ${
+                                      act.destacada
+                                        ? "bg-amber-100 text-amber-700"
+                                        : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200"
+                                    }`}
+                                  >
+                                    {act.destacada
+                                      ? "Quitar Destacada"
+                                      : "Destacar"}
+                                  </button>
+                                  <button
+                                    onClick={() => openModal("editar_act", act)}
+                                    className="text-neutral-400 hover:text-[#98002e] font-medium cursor-pointer"
+                                  >
+                                    Editar
+                                  </button>
+                                  {act.protegido && act.origen === "vtools" && (
                                     <button
-                                      onClick={() =>
-                                        toggleDestacada(act.id, act.destacada)
-                                      }
-                                      className={`text-[11px] font-bold px-2 py-1 rounded cursor-pointer transition-colors ${
-                                        act.destacada
-                                          ? "bg-amber-100 text-amber-700"
-                                          : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200"
-                                      }`}
+                                      onClick={() => quitarProteccion(act.id)}
+                                      className="text-neutral-400 hover:text-blue-700 font-medium cursor-pointer"
                                     >
-                                      {act.destacada
-                                        ? "Quitar Destacada"
-                                        : "Destacar"}
+                                      Desproteger
                                     </button>
-                                    <button
-                                      onClick={() =>
-                                        openModal("editar_act", act)
-                                      }
-                                      className="text-neutral-400 hover:text-[#98002e] font-medium cursor-pointer"
-                                    >
-                                      Editar
-                                    </button>
-                                    <button
-                                      onClick={() =>
-                                        openModal("eliminar_soft", {
-                                          ...act,
-                                          tabla: "actividades",
-                                        })
-                                      }
-                                      className="text-neutral-400 hover:text-red-600 font-medium cursor-pointer"
-                                    >
-                                      Ocultar
-                                    </button>
-                                  </>
-                                ) : (
-                                  <>
-                                    <button
-                                      onClick={() =>
-                                        toggleVisibility(
-                                          "actividades",
-                                          act.id,
-                                          false,
-                                        )
-                                      }
-                                      className="text-emerald-600 hover:text-emerald-700 font-medium cursor-pointer"
-                                    >
-                                      Restaurar
-                                    </button>
-                                    <button
-                                      onClick={() =>
-                                        openModal("eliminar_dir", {
-                                          ...act,
-                                          tabla: "actividades",
-                                        })
-                                      }
-                                      className="text-neutral-400 hover:text-red-600 font-medium cursor-pointer"
-                                    >
-                                      Eliminar
-                                    </button>
-                                  </>
-                                )}
-                              </td>
-                            </tr>
-                          ))
+                                  )}
+                                  <button
+                                    onClick={() =>
+                                      openModal("eliminar_soft", {
+                                        ...act,
+                                        tabla: "actividades",
+                                      })
+                                    }
+                                    className="text-neutral-400 hover:text-red-600 font-medium cursor-pointer"
+                                  >
+                                    Ocultar
+                                  </button>
+                                </>
+                              ) : (
+                                <>
+                                  <button
+                                    onClick={() =>
+                                      toggleVisibility(
+                                        "actividades",
+                                        act.id,
+                                        false,
+                                      )
+                                    }
+                                    className="text-emerald-600 hover:text-emerald-700 font-medium cursor-pointer"
+                                  >
+                                    Restaurar
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      openModal("eliminar_hard", {
+                                        ...act,
+                                        tabla: "actividades",
+                                      })
+                                    }
+                                    className="text-neutral-400 hover:text-red-600 font-medium cursor-pointer"
+                                  >
+                                    Eliminar
+                                  </button>
+                                </>
+                              )}
+                            </td>
+                          </tr>
+                        ))
                       )}
                     </tbody>
                   </table>
@@ -701,7 +774,7 @@ export default function AdminDashboard() {
               <CardContent className="p-0">
                 <div className="overflow-x-auto w-full">
                   <table className="w-full text-sm text-left text-neutral-600">
-                    <thead className="text-xs text-neutral-500 uppercase bg-slate-50 border-b border-neutral-200">
+                    <thead className="text-xs text-neutral-500 bg-slate-50 border-b border-neutral-200">
                       <tr>
                         <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
                           Orden
@@ -769,7 +842,7 @@ export default function AdminDashboard() {
                             </td>
                             <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
                               <span
-                                className={`inline-flex px-2 py-1 rounded-md text-[10px] font-bold uppercase ${
+                                className={`inline-flex px-2 py-1 rounded-md text-[10px] font-bold ${
                                   dir.activo
                                     ? "bg-emerald-50 text-emerald-700"
                                     : "bg-neutral-100 text-neutral-500"
@@ -787,7 +860,7 @@ export default function AdminDashboard() {
                               </button>
                               <button
                                 onClick={() =>
-                                  openModal("eliminar_dir", {
+                                  openModal("eliminar_hard", {
                                     ...dir,
                                     tabla: "directivos",
                                   })
@@ -845,7 +918,7 @@ export default function AdminDashboard() {
               <CardContent className="p-0">
                 <div className="overflow-x-auto w-full">
                   <table className="w-full text-sm text-left text-neutral-600">
-                    <thead className="text-xs text-neutral-500 uppercase bg-slate-50 border-b border-neutral-200">
+                    <thead className="text-xs text-neutral-500 bg-slate-50 border-b border-neutral-200">
                       <tr>
                         <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap min-w-[200px]">
                           Título del Proyecto
@@ -865,80 +938,74 @@ export default function AdminDashboard() {
                             Cargando proyectos...
                           </td>
                         </tr>
-                      ) : proyectos.filter((p) =>
-                          proyTabInfo === "activos" ? !p.oculto : p.oculto,
-                        ).length === 0 ? (
+                      ) : proyectosFiltrados.length === 0 ? (
                         <tr>
                           <td colSpan={3} className="px-6 py-12 text-center">
                             No hay proyectos.
                           </td>
                         </tr>
                       ) : (
-                        proyectos
-                          .filter((p) =>
-                            proyTabInfo === "activos" ? !p.oculto : p.oculto,
-                          )
-                          .map((proy) => (
-                            <tr key={proy.id} className="hover:bg-slate-50">
-                              <td className="px-4 md:px-6 py-3 md:py-4 font-medium text-neutral-900 whitespace-nowrap">
-                                {proy.titulo}
-                              </td>
-                              <td className="px-4 md:px-6 py-3 md:py-4 text-xs text-neutral-500 whitespace-nowrap">
-                                {proy.tecnologias}
-                              </td>
-                              <td className="px-4 md:px-6 py-3 md:py-4 text-right space-x-3 whitespace-nowrap">
-                                {proyTabInfo === "activos" ? (
-                                  <>
-                                    <button
-                                      onClick={() =>
-                                        openModal("editar_proy", proy)
-                                      }
-                                      className="text-neutral-400 hover:text-[#98002e] font-medium cursor-pointer"
-                                    >
-                                      Editar
-                                    </button>
-                                    <button
-                                      onClick={() =>
-                                        openModal("eliminar_soft", {
-                                          ...proy,
-                                          tabla: "proyectos",
-                                        })
-                                      }
-                                      className="text-neutral-400 hover:text-red-600 font-medium cursor-pointer"
-                                    >
-                                      Ocultar
-                                    </button>
-                                  </>
-                                ) : (
-                                  <>
-                                    <button
-                                      onClick={() =>
-                                        toggleVisibility(
-                                          "proyectos",
-                                          proy.id,
-                                          false,
-                                        )
-                                      }
-                                      className="text-emerald-600 hover:text-emerald-700 font-medium cursor-pointer"
-                                    >
-                                      Restaurar
-                                    </button>
-                                    <button
-                                      onClick={() =>
-                                        openModal("eliminar_dir", {
-                                          ...proy,
-                                          tabla: "proyectos",
-                                        })
-                                      }
-                                      className="text-neutral-400 hover:text-red-600 font-medium cursor-pointer"
-                                    >
-                                      Eliminar
-                                    </button>
-                                  </>
-                                )}
-                              </td>
-                            </tr>
-                          ))
+                        proyectosFiltrados.map((proy) => (
+                          <tr key={proy.id} className="hover:bg-slate-50">
+                            <td className="px-4 md:px-6 py-3 md:py-4 font-medium text-neutral-900 whitespace-nowrap">
+                              {proy.titulo}
+                            </td>
+                            <td className="px-4 md:px-6 py-3 md:py-4 text-xs text-neutral-500 whitespace-nowrap">
+                              {proy.tecnologias}
+                            </td>
+                            <td className="px-4 md:px-6 py-3 md:py-4 text-right space-x-3 whitespace-nowrap">
+                              {proyTabInfo === "activos" ? (
+                                <>
+                                  <button
+                                    onClick={() =>
+                                      openModal("editar_proy", proy)
+                                    }
+                                    className="text-neutral-400 hover:text-[#98002e] font-medium cursor-pointer"
+                                  >
+                                    Editar
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      openModal("eliminar_soft", {
+                                        ...proy,
+                                        tabla: "proyectos",
+                                      })
+                                    }
+                                    className="text-neutral-400 hover:text-red-600 font-medium cursor-pointer"
+                                  >
+                                    Ocultar
+                                  </button>
+                                </>
+                              ) : (
+                                <>
+                                  <button
+                                    onClick={() =>
+                                      toggleVisibility(
+                                        "proyectos",
+                                        proy.id,
+                                        false,
+                                      )
+                                    }
+                                    className="text-emerald-600 hover:text-emerald-700 font-medium cursor-pointer"
+                                  >
+                                    Restaurar
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      openModal("eliminar_hard", {
+                                        ...proy,
+                                        tabla: "proyectos",
+                                      })
+                                    }
+                                    className="text-neutral-400 hover:text-red-600 font-medium cursor-pointer"
+                                  >
+                                    Eliminar
+                                  </button>
+                                </>
+                              )}
+                            </td>
+                          </tr>
+                        ))
                       )}
                     </tbody>
                   </table>
@@ -966,7 +1033,7 @@ export default function AdminDashboard() {
               <CardContent className="p-0">
                 <div className="overflow-x-auto w-full">
                   <table className="w-full text-sm text-left text-neutral-600">
-                    <thead className="text-xs text-neutral-500 uppercase bg-slate-50 border-b border-neutral-200">
+                    <thead className="text-xs text-neutral-500 bg-slate-50 border-b border-neutral-200">
                       <tr>
                         <th className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap min-w-[250px]">
                           Patrocinador
@@ -998,22 +1065,24 @@ export default function AdminDashboard() {
                       ) : (
                         patrocinadores.map((pat) => (
                           <tr key={pat.id} className="hover:bg-slate-50">
-                            <td className="px-4 md:px-6 py-3 md:py-4 font-bold text-neutral-900 flex items-center gap-3 whitespace-nowrap">
-                              {pat.logo_url && (
-                                <img
-                                  src={pat.logo_url}
-                                  alt="logo"
-                                  className="h-8 w-auto rounded object-contain bg-white border p-1"
-                                />
-                              )}
-                              {pat.nombre}
+                            <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                              <div className="flex items-center gap-3 font-bold text-neutral-900">
+                                {pat.logo_url && (
+                                  <img
+                                    src={pat.logo_url}
+                                    alt={`Logo de ${pat.nombre}`}
+                                    className="h-8 w-auto rounded object-contain bg-white border p-1"
+                                  />
+                                )}
+                                {pat.nombre}
+                              </div>
                             </td>
                             <td className="px-4 md:px-6 py-3 md:py-4 font-medium whitespace-nowrap">
                               {pat.nivel}
                             </td>
                             <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
                               <span
-                                className={`inline-flex px-2 py-1 rounded-md text-[10px] font-bold uppercase ${
+                                className={`inline-flex px-2 py-1 rounded-md text-[10px] font-bold ${
                                   pat.activo
                                     ? "bg-emerald-50 text-emerald-700"
                                     : "bg-neutral-100 text-neutral-500"
@@ -1031,7 +1100,7 @@ export default function AdminDashboard() {
                               </button>
                               <button
                                 onClick={() =>
-                                  openModal("eliminar_dir", {
+                                  openModal("eliminar_hard", {
                                     ...pat,
                                     tabla: "patrocinadores",
                                   })
@@ -1091,15 +1160,17 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* Hard Delete (Eliminar) - Reutilizado para Directivos y Patrocinadores */}
-            {modalMode === "eliminar_dir" && (
+            {/* Hard Delete (Eliminar) - Reutilizado para todos los módulos */}
+            {modalMode === "eliminar_hard" && (
               <div className="text-center">
                 <h3 className="text-xl font-bold text-neutral-900 mb-2">
                   ¿Eliminar permanentemente?
                 </h3>
                 <p className="text-sm text-neutral-500 mb-6">
-                  Esta acción no se puede deshacer. Considera marcarlo como
-                  inactivo en su lugar.
+                  Esta acción no se puede deshacer.
+                  {selectedItem?.origen === "vtools"
+                    ? " Si el evento sigue publicado en vTools, reaparecerá en la próxima sincronización."
+                    : " Considera ocultarlo o marcarlo como inactivo en su lugar."}
                 </p>
                 <div className="flex justify-end gap-3">
                   <button
@@ -1112,29 +1183,32 @@ export default function AdminDashboard() {
                   <button
                     onClick={() =>
                       selectedItem &&
-                      deleteRecord(selectedItem.tabla, selectedItem.id)
+                      deleteRecord(
+                        selectedItem.tabla,
+                        selectedItem.id,
+                        selectedItem.imagen_url ?? selectedItem.logo_url,
+                      )
                     }
                     disabled={isSubmitting}
                     className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md cursor-pointer"
                   >
-                    Eliminar
+                    {isSubmitting ? "Eliminando..." : "Eliminar"}
                   </button>
                 </div>
               </div>
             )}
 
             {/* Formulario Maestro */}
-            {(modalMode.includes("crear_") ||
-              modalMode.includes("editar_")) && (
+            {esFormulario && (
               <form onSubmit={handleDynamicSubmit} className="space-y-4">
                 <h3 className="text-xl font-bold bg-gradient-to-t from-[#5f2167] to-[#98002e] bg-clip-text text-transparent">
-                  {modalMode.includes("crear_")
+                  {modalMode.startsWith("crear_")
                     ? "Añadir Nuevo"
                     : "Editar Registro"}
                 </h3>
 
                 {/* Campos Actividades */}
-                {modalMode.includes("_act") && (
+                {moduloModal === "act" && (
                   <>
                     <div>
                       <label className="block text-xs font-bold text-neutral-700 mb-1">
@@ -1207,7 +1281,7 @@ export default function AdminDashboard() {
                 )}
 
                 {/* Campos Directivos */}
-                {modalMode.includes("_dir") && (
+                {moduloModal === "dir" && (
                   <>
                     <div>
                       <label className="block text-xs font-bold text-neutral-700 mb-1">
@@ -1291,7 +1365,9 @@ export default function AdminDashboard() {
                           onChange={(e) =>
                             setDirFormData({
                               ...dirFormData,
-                              orden: parseInt(e.target.value),
+                              orden: Number.isNaN(e.target.valueAsNumber)
+                                ? 0
+                                : e.target.valueAsNumber,
                             })
                           }
                           className="w-full h-10 px-3 border rounded-md text-sm"
@@ -1320,7 +1396,7 @@ export default function AdminDashboard() {
                 )}
 
                 {/* Campos Proyectos */}
-                {modalMode.includes("_proy") && (
+                {moduloModal === "proy" && (
                   <>
                     <div>
                       <label className="block text-xs font-bold text-neutral-700 mb-1">
@@ -1391,7 +1467,7 @@ export default function AdminDashboard() {
                 )}
 
                 {/* Campos Patrocinadores */}
-                {modalMode.includes("_pat") && (
+                {moduloModal === "pat" && (
                   <>
                     <div>
                       <label className="block text-xs font-bold text-neutral-700 mb-1">
@@ -1474,12 +1550,12 @@ export default function AdminDashboard() {
                 {/* Upload Universal */}
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 mb-1">
-                    {modalMode.includes("pat") ? "Logo" : "Imagen"}{" "}
-                    {modalMode.includes("editar_") && "(Opcional)"}
+                    {moduloModal === "pat" ? "Logo" : "Imagen"}{" "}
+                    {modalMode.startsWith("editar_") && "(Opcional)"}
                   </label>
                   <input
                     type="file"
-                    accept="image/jpeg, image/png, image/webp"
+                    accept="image/jpeg,image/png,image/webp"
                     onChange={handleImageSelection}
                     className="w-full text-xs"
                   />

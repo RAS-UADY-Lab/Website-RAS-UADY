@@ -228,7 +228,7 @@ export default function BatallaDeRobotsPage() {
   const timeLeft = useCountdown(EVENT_START);
 
   return (
-    <main className="flex min-h-screen w-full flex-col overflow-x-hidden bg-slate-50 text-neutral-900">
+    <div className="flex min-h-screen w-full flex-col overflow-x-hidden bg-slate-50 text-neutral-900">
       {/* Hero */}
       <section className="relative w-full overflow-hidden bg-gradient-to-br from-[#98002e] to-[#5f2167] pb-20 pt-32 shadow-sm shadow-neutral-900/20 md:pb-28 md:pt-44">
         <div className="absolute inset-0 z-0 bg-black/10 mix-blend-overlay"></div>
@@ -818,6 +818,6 @@ export default function BatallaDeRobotsPage() {
           </Reveal>
         </div>
       </section>
-    </main>
+    </div>
   );
 }
